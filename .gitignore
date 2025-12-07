@@ -1,6 +1,7 @@
 .env
 .venv
 dumpster
+notes
 __pycache__/
 *.pyc
 .pytest_cache/
