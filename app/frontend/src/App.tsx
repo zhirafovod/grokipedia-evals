@@ -447,6 +447,23 @@ function CompareApp() {
     enabled: !!topic,
     refetchInterval: 4000,
   });
+  useEffect(() => {
+    if (recomputeStatus?.status === "running") {
+      setIsRecomputing(true);
+    } else if (recomputeStatus) {
+      setIsRecomputing(false);
+    }
+  }, [recomputeStatus, setIsRecomputing]);
+
+  const recomputeRunning = recompute.isPending || isRecomputing || recomputeStatus?.status === "running";
+  const recomputeLabel =
+    recomputeStatus?.status === "running"
+      ? "Evaluating…"
+      : recomputeStatus?.status === "ok"
+        ? "Evaluation complete"
+        : recomputeStatus?.status === "error"
+          ? "Evaluation failed"
+          : "Idle";
 
   const metaLine = useMemo(() => {
     const model = analysis?.model || raw?.metadata?.model;
@@ -496,13 +513,16 @@ function CompareApp() {
             </div>
           )}
           <button
-            disabled={!topic || recompute.isPending || isRecomputing}
+            disabled={!topic || recomputeRunning}
             onClick={() => recompute.mutate()}
             className="ghost"
-            title="Regenerate graphs, comparison, embeddings"
+            title="Re-evaluate: regenerate graphs, comparison, embeddings, segments"
           >
-            {recompute.isPending || isRecomputing ? "Recomputing…" : "Recompute"}
+            {recomputeRunning ? "Re-evaluating…" : "Re-evaluate"}
           </button>
+          <div className={`status-chip ${recomputeRunning ? "running" : recomputeStatus?.status === "error" ? "error" : "ok"}`}>
+            {recomputeLabel}
+          </div>
         </div>
       </header>
 

@@ -143,8 +143,9 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Keyboard navigation, clear legends, tooltips.
 
 8. [ ] Optional recompute pipeline
+   - [x] Add simple status endpoint + UI indicator for recompute/evaluation progress.
    - [ ] Add async job handling (Celery or simple background tasks) for `recompute`.
-   - [ ] Cache control and progress status endpoint.
+   - [ ] Cache control and progress status endpoint (persistent).
 
 ## Next immediate actions
 - Wire diff/sync-scroll using aligned segments and add inline diff view.
