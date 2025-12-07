@@ -11,20 +11,33 @@ from __future__ import annotations
 import json
 import re
 import html
+import os
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
+import altair as alt
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
+import requests
+import difflib
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_ROOT = BASE_DIR / "data" / "raw"
 ARTIFACT_ROOT = BASE_DIR / "data" / "artifacts"
+BACKEND_URL = os.environ.get("BACKEND_URL")
 
 
 def list_topics(data_root: Path) -> Tuple[str, ...]:
-    """Return sorted topic slugs found under data/raw."""
+    """Return sorted topic slugs under data/raw or via backend."""
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topics", timeout=10)
+            resp.raise_for_status()
+            return tuple(resp.json())
+        except Exception:
+            return tuple()
     if not data_root.exists():
         return tuple()
     topics = [p.name for p in data_root.iterdir() if p.is_dir()]
@@ -33,6 +46,13 @@ def list_topics(data_root: Path) -> Tuple[str, ...]:
 
 def load_metadata(topic_dir: Path) -> Dict[str, object]:
     meta_path = topic_dir / "metadata.json"
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic_dir.name}/raw", timeout=15)
+            resp.raise_for_status()
+            return resp.json().get("metadata", {})
+        except Exception:
+            return {}
     if meta_path.exists():
         try:
             return json.loads(meta_path.read_text(encoding="utf-8"))
@@ -51,6 +71,14 @@ def pick_grok_file(topic_dir: Path) -> Optional[Path]:
 
 def load_article_content(topic_dir: Path) -> Tuple[str, str, Dict[str, object]]:
     """Load grok and wiki content plus metadata; empty strings if missing."""
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic_dir.name}/raw", timeout=20)
+            resp.raise_for_status()
+            payload = resp.json()
+            return payload.get("grokipedia", ""), payload.get("wikipedia", ""), payload.get("metadata", {})
+        except Exception:
+            pass
     metadata = load_metadata(topic_dir)
     grok_path = pick_grok_file(topic_dir)
     wiki_path = topic_dir / "wikipedia.txt"
@@ -61,10 +89,72 @@ def load_article_content(topic_dir: Path) -> Tuple[str, str, Dict[str, object]]:
 
 def load_analysis(topic: str) -> Optional[Dict[str, Any]]:
     path = ARTIFACT_ROOT / topic / "analysis.json"
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic}/analysis", timeout=20)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception:
+            return None
     if not path.exists():
         return None
     try:
         return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def load_comparison(topic: str) -> Optional[Dict[str, Any]]:
+    path = ARTIFACT_ROOT / topic / "comparison.json"
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic}/comparison", timeout=20)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception:
+            return None
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def load_embeddings(topic: str) -> Optional[Dict[str, Any]]:
+    path = ARTIFACT_ROOT / topic / "embeddings.json"
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic}/embeddings", timeout=20)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception:
+            return None
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def load_graphs(topic: str) -> Optional[Dict[str, Any]]:
+    grok = ARTIFACT_ROOT / topic / "grokipedia_graph.json"
+    wiki = ARTIFACT_ROOT / topic / "wikipedia_graph.json"
+    if BACKEND_URL:
+        try:
+            resp = requests.get(f"{BACKEND_URL}/api/topic/{topic}/graphs", timeout=20)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception:
+            return None
+    if not grok.exists() or not wiki.exists():
+        return None
+    try:
+        return {
+            "grokipedia": json.loads(grok.read_text(encoding="utf-8")),
+            "wikipedia": json.loads(wiki.read_text(encoding="utf-8")),
+        }
     except Exception:
         return None
 
@@ -371,6 +461,141 @@ def render_llm_metrics(analysis: Dict[str, Any]) -> None:
     st.json(llm_metrics, expanded=False)
 
 
+def sentence_diff(a_text: str, b_text: str) -> Dict[str, list]:
+    splitter = re.compile(r"(?<=[.!?])\s+")
+    a_sentences = [s.strip() for s in splitter.split(a_text) if s.strip()]
+    b_sentences = [s.strip() for s in splitter.split(b_text) if s.strip()]
+    sm = difflib.SequenceMatcher(a=a_sentences, b=b_sentences)
+    ops = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        ops.append({"tag": tag, "a": a_sentences[i1:i2], "b": b_sentences[j1:j2]})
+    return {"ops": ops}
+
+
+def render_sentence_diff(grok_text: str, wiki_text: str) -> None:
+    st.subheader("Sentence-level diff")
+    diff = sentence_diff(grok_text, wiki_text)
+    rows = []
+    for op in diff["ops"]:
+        tag = op["tag"]
+        a_chunk = " ".join(op["a"])
+        b_chunk = " ".join(op["b"])
+        rows.append(
+            {
+                "op": tag,
+                "grok": a_chunk,
+                "wiki": b_chunk,
+            }
+        )
+    def color_for(op: str) -> str:
+        if op == "equal":
+            return "#e0f7fa"
+        if op == "replace":
+            return "#fff4e6"
+        if op == "delete":
+            return "#ffe6e6"
+        if op == "insert":
+            return "#e6ffe6"
+        return "#f5f5f5"
+
+    for row in rows:
+        st.markdown(
+            f"""
+            <div style="border:1px solid #ddd;border-radius:6px;padding:8px;margin-bottom:6px;">
+                <div style="font-size:12px;color:#555;">op: {row['op']}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div style="background:{color_for(row['op'])};padding:6px;border-radius:4px;"><strong>Grok</strong><br>{html.escape(row['grok']) or '<i>(empty)</i>'}</div>
+                    <div style="background:{color_for(row['op'])};padding:6px;border-radius:4px;"><strong>Wiki</strong><br>{html.escape(row['wiki']) or '<i>(empty)</i>'}</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def render_comparison_panel(comparison: Optional[Dict[str, Any]]) -> None:
+    st.subheader("Comparison metrics (graph-level)")
+    if not comparison:
+        st.info("No comparison.json available. Run generate_graphs.py.")
+        return
+    ent = comparison.get("entity_overlap", {}) or {}
+    edge = comparison.get("edge_overlap", {}) or {}
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(
+            f"**Entity overlap Jaccard:** {ent.get('jaccard', 0):.3f} | "
+            f"shared: {len(ent.get('intersection', []))}"
+        )
+        st.caption("Unique (Grokipedia)")
+        st.code(", ".join(ent.get("grok_unique", []) or []))
+        st.caption("Unique (Wikipedia)")
+        st.code(", ".join(ent.get("wiki_unique", []) or []))
+    with col2:
+        st.markdown(
+            f"**Edge overlap Jaccard:** {edge.get('jaccard', 0):.3f} | "
+            f"shared: {len(edge.get('intersection', []))}"
+        )
+        if edge.get("intersection"):
+            st.caption("Shared edges (src, pred, dst)")
+            st.code("\n".join([str(e) for e in edge.get("intersection", [])]))
+
+
+def render_graph_stats(graphs: Optional[Dict[str, Any]]) -> None:
+    st.subheader("Graph stats")
+    if not graphs:
+        st.info("No graphs found. Run generate_graphs.py.")
+        return
+    data = []
+    for name, graph in graphs.items():
+        stats = graph.get("stats", {})
+        data.append(
+            {
+                "source": name,
+                "nodes": stats.get("node_count", 0),
+                "edges": stats.get("edge_count", 0),
+            }
+        )
+    st.dataframe(data, hide_index=True, use_container_width=True)
+
+
+def render_embeddings_map(embeddings: Optional[Dict[str, Any]]) -> None:
+    st.subheader("Embedding map")
+    if not embeddings:
+        st.info("No embeddings found. Run generate_graphs.py.")
+        return
+    points = embeddings.get("points", []) or []
+    if not points:
+        st.info("Embedding points are empty.")
+        return
+    df = pd.DataFrame(
+        [
+            {
+                "x": p.get("x"),
+                "y": p.get("y"),
+                "label": p.get("label"),
+                "source": p.get("source"),
+                "type": p.get("type"),
+                "sentiment": p.get("sentiment"),
+                "salience": p.get("salience"),
+            }
+            for p in points
+        ]
+    )
+    chart = (
+        alt.Chart(df)
+        .mark_circle(size=80, opacity=0.7)
+        .encode(
+            x=alt.X("x:Q", title="Component 1"),
+            y=alt.Y("y:Q", title="Component 2"),
+            color=alt.Color("source:N"),
+            shape=alt.Shape("type:N"),
+            tooltip=["label:N", "source:N", "type:N", "sentiment:N", "salience:Q"],
+        )
+        .properties(height=360)
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+
 def render_relation_graphs(analysis: Dict[str, Any]) -> None:
     st.subheader("Relations (graph view)")
     cols = st.columns(3)
@@ -413,6 +638,9 @@ def main() -> None:
 
     topic_dir = DATA_ROOT / topic
     analysis = load_analysis(topic)
+    comparison = load_comparison(topic)
+    graphs = load_graphs(topic)
+    embeddings = load_embeddings(topic)
     grok_text, wiki_text, metadata = load_article_content(topic_dir)
 
     st.subheader(f"Topic: {topic}")
@@ -436,6 +664,10 @@ def main() -> None:
         render_linked_text(analysis, grok_text, wiki_text)
         render_diff_entities(analysis)
         render_llm_metrics(analysis)
+        render_comparison_panel(comparison)
+        render_graph_stats(graphs)
+        render_embeddings_map(embeddings)
+        render_sentence_diff(grok_text, wiki_text)
     else:
         st.info("No analysis artifact found in data/artifacts/<topic>/analysis.json. Run scripts/run_extraction.py first.")
 

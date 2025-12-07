@@ -1,0 +1,335 @@
+{
+  "model": "all-MiniLM-L6-v2",
+  "points": [
+    {
+      "id": "covid_19_lab_leak_theory",
+      "label": "COVID-19 lab leak theory",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.9,
+      "x": 0.4460979700088501,
+      "y": 0.43004167079925537
+    },
+    {
+      "id": "sars_cov_2",
+      "label": "SARS-CoV-2",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.85,
+      "x": 0.5243939757347107,
+      "y": 0.23842066526412964
+    },
+    {
+      "id": "wuhan_institute_of_virology_wiv",
+      "label": "Wuhan Institute of Virology (WIV)",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "negative",
+      "salience": 0.8,
+      "x": -0.10868221521377563,
+      "y": 0.5581117868423462
+    },
+    {
+      "id": "wuhan_china",
+      "label": "Wuhan, China",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.75,
+      "x": -0.519129753112793,
+      "y": 0.17987515032291412
+    },
+    {
+      "id": "fbi",
+      "label": "FBI",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.6,
+      "x": 0.06623785942792892,
+      "y": -0.053230464458465576
+    },
+    {
+      "id": "department_of_energy",
+      "label": "Department of Energy",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.55,
+      "x": 0.10492347180843353,
+      "y": 0.009366643615067005
+    },
+    {
+      "id": "cia",
+      "label": "CIA",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.5,
+      "x": 0.03570892661809921,
+      "y": 0.03217703476548195
+    },
+    {
+      "id": "germany_s_foreign_intelligence_service",
+      "label": "Germany's foreign intelligence service",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.45,
+      "x": 0.10931681096553802,
+      "y": 0.21061907708644867
+    },
+    {
+      "id": "u_s_house_subcommittee",
+      "label": "U.S. House subcommittee",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.4,
+      "x": 0.17685973644256592,
+      "y": 0.0026607010513544083
+    },
+    {
+      "id": "shi_zhengli",
+      "label": "Shi Zhengli",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.35,
+      "x": -0.4395994246006012,
+      "y": -0.1561785638332367
+    },
+    {
+      "id": "ecohealth_alliance",
+      "label": "EcoHealth Alliance",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.3,
+      "x": -0.040921613574028015,
+      "y": 0.1878405511379242
+    },
+    {
+      "id": "niaid",
+      "label": "NIAID",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.25,
+      "x": -0.29968196153640747,
+      "y": -0.11266858130693436
+    },
+    {
+      "id": "huanan_seafood_wholesale_market",
+      "label": "Huanan Seafood Wholesale Market",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.2,
+      "x": -0.4892367422580719,
+      "y": 0.0072375694289803505
+    },
+    {
+      "id": "yunnan_province",
+      "label": "Yunnan Province",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.15,
+      "x": -0.43478885293006897,
+      "y": 0.15924783051013947
+    },
+    {
+      "id": "ratg13",
+      "label": "RaTG13",
+      "source": "grokipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.1,
+      "x": 0.08735306560993195,
+      "y": -0.3439303934574127
+    },
+    {
+      "id": "sars_cov_2",
+      "label": "SARS-CoV-2",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.9,
+      "x": 0.5243939161300659,
+      "y": 0.23842060565948486
+    },
+    {
+      "id": "covid_19",
+      "label": "COVID-19",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.85,
+      "x": 0.38625699281692505,
+      "y": 0.20482465624809265
+    },
+    {
+      "id": "wuhan_institute_of_virology",
+      "label": "Wuhan Institute of Virology",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "negative",
+      "salience": 0.8,
+      "x": -0.16915938258171082,
+      "y": 0.5333160758018494
+    },
+    {
+      "id": "huanan_seafood_market",
+      "label": "Huanan Seafood Market",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.75,
+      "x": -0.5004825592041016,
+      "y": 0.011122137308120728
+    },
+    {
+      "id": "wuhan",
+      "label": "Wuhan",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.7,
+      "x": -0.38089463114738464,
+      "y": 0.045057591050863266
+    },
+    {
+      "id": "china",
+      "label": "China",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "negative",
+      "salience": 0.65,
+      "x": -0.2891022264957428,
+      "y": 0.07436923682689667
+    },
+    {
+      "id": "bats",
+      "label": "Bats",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.6,
+      "x": 0.17478281259536743,
+      "y": -0.24802182614803314
+    },
+    {
+      "id": "world_health_organization",
+      "label": "World Health Organization",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.55,
+      "x": -0.021891802549362183,
+      "y": 0.3570776879787445
+    },
+    {
+      "id": "zoonosis",
+      "label": "Zoonosis",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.5,
+      "x": 0.170053631067276,
+      "y": 0.04994389787316322
+    },
+    {
+      "id": "lab_leak_theory",
+      "label": "Lab Leak Theory",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "negative",
+      "salience": 0.45,
+      "x": 0.2680462598800659,
+      "y": 0.23787972331047058
+    },
+    {
+      "id": "ratg13",
+      "label": "RaTG13",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.4,
+      "x": 0.08735306560993195,
+      "y": -0.3439303934574127
+    },
+    {
+      "id": "banal_52",
+      "label": "BANAL-52",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.35,
+      "x": 0.1278417408466339,
+      "y": -0.32352644205093384
+    },
+    {
+      "id": "richard_ebright",
+      "label": "Richard Ebright",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.3,
+      "x": 0.010162856429815292,
+      "y": -0.31101441383361816
+    },
+    {
+      "id": "ralph_baric",
+      "label": "Ralph Baric",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.25,
+      "x": 0.11162233352661133,
+      "y": -0.4230436682701111
+    },
+    {
+      "id": "danielle_anderson",
+      "label": "Danielle Anderson",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.2,
+      "x": -0.1444810926914215,
+      "y": -0.26048988103866577
+    },
+    {
+      "id": "stephan_lewandowsky",
+      "label": "Stephan Lewandowsky",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.15,
+      "x": 0.06033612787723541,
+      "y": -0.2774336338043213
+    },
+    {
+      "id": "marc_lipsitch",
+      "label": "Marc Lipsitch",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.1,
+      "x": 0.17531254887580872,
+      "y": -0.501114010810852
+    },
+    {
+      "id": "roger_frutos",
+      "label": "Roger Frutos",
+      "source": "wikipedia",
+      "type": "entity",
+      "sentiment": "neutral",
+      "salience": 0.05,
+      "x": 0.19099855422973633,
+      "y": -0.4130285084247589
+    }
+  ]
+}

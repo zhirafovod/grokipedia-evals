@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "topic": "COVID-19_lab_leak_theory",
+    "source": "grokipedia",
+    "model": "grok-3",
+    "generated_at": "2025-12-07T16:31:27.497278+00:00"
+  },
+  "nodes": [
+    {
+      "id": "covid_19_lab_leak_theory",
+      "type": "entity",
+      "label": "COVID-19 lab leak theory",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.9,
+        "aliases": []
+      }
+    },
+    {
+      "id": "sars_cov_2",
+      "type": "entity",
+      "label": "SARS-CoV-2",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.85,
+        "aliases": []
+      }
+    },
+    {
+      "id": "wuhan_institute_of_virology_wiv",
+      "type": "entity",
+      "label": "Wuhan Institute of Virology (WIV)",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "negative",
+        "salience": 0.8,
+        "aliases": []
+      }
+    },
+    {
+      "id": "wuhan_china",
+      "type": "entity",
+      "label": "Wuhan, China",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.75,
+        "aliases": []
+      }
+    },
+    {
+      "id": "fbi",
+      "type": "entity",
+      "label": "FBI",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.6,
+        "aliases": []
+      }
+    },
+    {
+      "id": "department_of_energy",
+      "type": "entity",
+      "label": "Department of Energy",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.55,
+        "aliases": []
+      }
+    },
+    {
+      "id": "cia",
+      "type": "entity",
+      "label": "CIA",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.5,
+        "aliases": []
+      }
+    },
+    {
+      "id": "germany_s_foreign_intelligence_service",
+      "type": "entity",
+      "label": "Germany's foreign intelligence service",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.45,
+        "aliases": []
+      }
+    },
+    {
+      "id": "u_s_house_subcommittee",
+      "type": "entity",
+      "label": "U.S. House subcommittee",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.4,
+        "aliases": []
+      }
+    },
+    {
+      "id": "shi_zhengli",
+      "type": "entity",
+      "label": "Shi Zhengli",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.35,
+        "aliases": []
+      }
+    },
+    {
+      "id": "ecohealth_alliance",
+      "type": "entity",
+      "label": "EcoHealth Alliance",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.3,
+        "aliases": []
+      }
+    },
+    {
+      "id": "niaid",
+      "type": "entity",
+      "label": "NIAID",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.25,
+        "aliases": []
+      }
+    },
+    {
+      "id": "huanan_seafood_wholesale_market",
+      "type": "entity",
+      "label": "Huanan Seafood Wholesale Market",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.2,
+        "aliases": []
+      }
+    },
+    {
+      "id": "yunnan_province",
+      "type": "entity",
+      "label": "Yunnan Province",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.15,
+        "aliases": []
+      }
+    },
+    {
+      "id": "ratg13",
+      "type": "entity",
+      "label": "RaTG13",
+      "source": "grokipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.1,
+        "aliases": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "covid_19_lab_leak_theory__hypothesizes__sars_cov_2_originated_from_wuhan_institute_of_virology",
+      "src": "covid_19_lab_leak_theory",
+      "dst": "sars_cov_2_originated_from_wuhan_institute_of_virology",
+      "type": "relation",
+      "label": "hypothesizes",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "hypothesizes that SARS-CoV-2... originated from an accidental release at the Wuhan Institute of Virology"
+      }
+    },
+    {
+      "id": "wuhan_institute_of_virology__conducted research on__bat_coronaviruses",
+      "src": "wuhan_institute_of_virology",
+      "dst": "bat_coronaviruses",
+      "type": "relation",
+      "label": "conducted research on",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "a facility in China conducting research on bat coronaviruses"
+      }
+    },
+    {
+      "id": "wiv__reported__biosafety_concerns",
+      "src": "wiv",
+      "dst": "biosafety_concerns",
+      "type": "relation",
+      "label": "reported",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "reported biosafety concerns including inadequate training and equipment failures"
+      }
+    },
+    {
+      "id": "fbi__concluded__lab_origin_with_moderate_confidence",
+      "src": "fbi",
+      "dst": "lab_origin_with_moderate_confidence",
+      "type": "relation",
+      "label": "concluded",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "FBI concluding a lab origin with moderate confidence"
+      }
+    },
+    {
+      "id": "department_of_energy__assessed__lab_origin_with_low_confidence",
+      "src": "department_of_energy",
+      "dst": "lab_origin_with_low_confidence",
+      "type": "relation",
+      "label": "assessed",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "Department of Energy with low confidence"
+      }
+    },
+    {
+      "id": "cia__shifted to__lab_leak_more_likely_in_2025",
+      "src": "cia",
+      "dst": "lab_leak_more_likely_in_2025",
+      "type": "relation",
+      "label": "shifted to",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "CIA shifting in 2025 to deem a lab leak more likely"
+      }
+    },
+    {
+      "id": "germany_s_foreign_intelligence__estimated__80_90_probability_of_lab_accident",
+      "src": "germany_s_foreign_intelligence",
+      "dst": "80_90_probability_of_lab_accident",
+      "type": "relation",
+      "label": "estimated",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "Germany's foreign intelligence service estimated an 80-90% probability of a lab accident"
+      }
+    },
+    {
+      "id": "wiv_researchers__experienced__illnesses_in_late_2019",
+      "src": "wiv_researchers",
+      "dst": "illnesses_in_late_2019",
+      "type": "relation",
+      "label": "experienced",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "reports of illnesses among WIV researchers in late 2019"
+      }
+    },
+    {
+      "id": "sars_cov_2__has__furin_cleavage_site",
+      "src": "sars_cov_2",
+      "dst": "furin_cleavage_site",
+      "type": "relation",
+      "label": "has",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "the virus's distinctive furin cleavage site"
+      }
+    },
+    {
+      "id": "u_s_house_subcommittee__affirmed__lab_leak_as_most_probable_origin",
+      "src": "u_s_house_subcommittee",
+      "dst": "lab_leak_as_most_probable_origin",
+      "type": "relation",
+      "label": "affirmed",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "U.S. House subcommittee investigation in 2024 affirmed the lab leak as the most probable origin"
+      }
+    },
+    {
+      "id": "ecohealth_alliance__funded__bat_coronavirus_research_at_wiv",
+      "src": "ecohealth_alliance",
+      "dst": "bat_coronavirus_research_at_wiv",
+      "type": "relation",
+      "label": "funded",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "Funding for such bat coronavirus research at WIV included subgrants from... EcoHealth Alliance"
+      }
+    },
+    {
+      "id": "wiv__took offline__public_database_of_viral_samples",
+      "src": "wiv",
+      "dst": "public_database_of_viral_samples",
+      "type": "relation",
+      "label": "took offline",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "on September 12, 2019, WIV took its public database of over 22,000 viral samples offline"
+      }
+    },
+    {
+      "id": "sars_cov_2__emerged in__wuhan_china",
+      "src": "sars_cov_2",
+      "dst": "wuhan_china",
+      "type": "relation",
+      "label": "emerged in",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "The virus first emerged in Wuhan, China"
+      }
+    },
+    {
+      "id": "h1n1_influenza_a_virus__reemerged due to__laboratory_leak_in_1977",
+      "src": "h1n1_influenza_a_virus",
+      "dst": "laboratory_leak_in_1977",
+      "type": "relation",
+      "label": "reemerged due to",
+      "source": "grokipedia",
+      "attrs": {
+        "evidence_span": "reemergence of the H1N1 influenza A virus in 1977... attributed to an accidental release"
+      }
+    }
+  ],
+  "stats": {
+    "node_count": 15,
+    "edge_count": 14
+  }
+}

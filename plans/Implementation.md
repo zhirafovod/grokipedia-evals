@@ -96,41 +96,38 @@ A single responsive page providing side-by-side comparison with deep interactivi
 
 ## Iterative Steps
 
-1. Server scaffolding (FastAPI)
-   - Create `server/` with `main.py`, `routes.py`.
-   - Implement endpoints: topics/raw/analysis/graphs/comparison.
-   - Add `POST /recompute` calling graph generation.
+1. [x] Server scaffolding (FastAPI)
+   - [x] Create `server/` with `main.py`.
+   - [x] Implement endpoints: topics/raw/analysis/graphs/comparison/embeddings + recompute.
 
-2. Graph generation
-   - Implement `scripts/generate_graphs.py` per `plans/Graph.md`.
-   - Write `<source>_graph.json` and `comparison.json` for existing topic.
+2. [x] Graph generation
+   - [x] Implement `scripts/generate_graphs.py` per `plans/Graph.md`.
+   - [x] Write `<source>_graph.json`, `comparison.json`, `embeddings.json` for existing topic.
 
-3. UI foundation
-   - Replace Streamlit with React + Vite app in `app/`.
-   - Pages: `CompareView` and components: `TextPane`, `EntityList`, `MetricsPanel`, `NetworkView`, `EmbeddingMap`.
-   - Fetch from local server endpoints.
+3. [ ] UI foundation
+   - [ ] Replace Streamlit with React + Vite app in `app/`.
+   - [ ] Pages: `CompareView` and components: `TextPane`, `EntityList`, `MetricsPanel`, `NetworkView`, `EmbeddingMap`.
+   - [ ] Fetch from local server endpoints.
 
-4. Text highlighting & diff
-   - Segment articles; align by entity overlap.
-   - Implement hover/click tooltips with metrics.
-   - Add inline diff mode with color-coded changes.
+4. [ ] Text highlighting & diff
+   - [x] Implement hover/click tooltips with metrics (Streamlit prototype).
+   - [ ] Segment articles; align by entity overlap for diff mode; inline diff.
 
-5. Embeddings map
-   - Generate embeddings (sentence-transformers) for entities.
-   - Precompute 2D projection; serve `embeddings.json`.
-   - Implement interactive scatter map with filters and tooltips.
+5. [ ] Embeddings map
+   - [x] Generate embeddings (sentence-transformers) for entities; save `embeddings.json`.
+   - [ ] Implement interactive scatter map with filters and tooltips in main UI.
 
-6. Graph viz
-   - Cytoscape.js network view per source; merged overlay mode.
-   - Legend, filters, and style mapping for bias signals.
+6. [ ] Graph viz
+   - [ ] Cytoscape.js network view per source; merged overlay mode.
+   - [ ] Legend, filters, and style mapping for bias signals.
 
-7. Polishing & accessibility
-   - Responsive layout and aesthetic polish.
-   - Keyboard navigation, clear legends, tooltips.
+7. [ ] Polishing & accessibility
+   - [ ] Responsive layout and aesthetic polish.
+   - [ ] Keyboard navigation, clear legends, tooltips.
 
-8. Optional recompute pipeline
-   - Add async job handling (Celery or simple background tasks) for `recompute`.
-   - Cache control and progress status endpoint.
+8. [ ] Optional recompute pipeline
+   - [ ] Add async job handling (Celery or simple background tasks) for `recompute`.
+   - [ ] Cache control and progress status endpoint.
 
 ## Minimal Tech Stack
 

@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "topic": "COVID-19_lab_leak_theory",
+    "source": "wikipedia",
+    "model": "grok-3",
+    "generated_at": "2025-12-07T16:31:27.497278+00:00"
+  },
+  "nodes": [
+    {
+      "id": "sars_cov_2",
+      "type": "entity",
+      "label": "SARS-CoV-2",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.9,
+        "aliases": []
+      }
+    },
+    {
+      "id": "covid_19",
+      "type": "entity",
+      "label": "COVID-19",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.85,
+        "aliases": []
+      }
+    },
+    {
+      "id": "wuhan_institute_of_virology",
+      "type": "entity",
+      "label": "Wuhan Institute of Virology",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "negative",
+        "salience": 0.8,
+        "aliases": []
+      }
+    },
+    {
+      "id": "huanan_seafood_market",
+      "type": "entity",
+      "label": "Huanan Seafood Market",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.75,
+        "aliases": []
+      }
+    },
+    {
+      "id": "wuhan",
+      "type": "entity",
+      "label": "Wuhan",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.7,
+        "aliases": []
+      }
+    },
+    {
+      "id": "china",
+      "type": "entity",
+      "label": "China",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "negative",
+        "salience": 0.65,
+        "aliases": []
+      }
+    },
+    {
+      "id": "bats",
+      "type": "entity",
+      "label": "Bats",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.6,
+        "aliases": []
+      }
+    },
+    {
+      "id": "world_health_organization",
+      "type": "entity",
+      "label": "World Health Organization",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.55,
+        "aliases": []
+      }
+    },
+    {
+      "id": "zoonosis",
+      "type": "entity",
+      "label": "Zoonosis",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.5,
+        "aliases": []
+      }
+    },
+    {
+      "id": "lab_leak_theory",
+      "type": "entity",
+      "label": "Lab Leak Theory",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "negative",
+        "salience": 0.45,
+        "aliases": []
+      }
+    },
+    {
+      "id": "ratg13",
+      "type": "entity",
+      "label": "RaTG13",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.4,
+        "aliases": []
+      }
+    },
+    {
+      "id": "banal_52",
+      "type": "entity",
+      "label": "BANAL-52",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.35,
+        "aliases": []
+      }
+    },
+    {
+      "id": "richard_ebright",
+      "type": "entity",
+      "label": "Richard Ebright",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.3,
+        "aliases": []
+      }
+    },
+    {
+      "id": "ralph_baric",
+      "type": "entity",
+      "label": "Ralph Baric",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.25,
+        "aliases": []
+      }
+    },
+    {
+      "id": "danielle_anderson",
+      "type": "entity",
+      "label": "Danielle Anderson",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.2,
+        "aliases": []
+      }
+    },
+    {
+      "id": "stephan_lewandowsky",
+      "type": "entity",
+      "label": "Stephan Lewandowsky",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.15,
+        "aliases": []
+      }
+    },
+    {
+      "id": "marc_lipsitch",
+      "type": "entity",
+      "label": "Marc Lipsitch",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.1,
+        "aliases": []
+      }
+    },
+    {
+      "id": "roger_frutos",
+      "type": "entity",
+      "label": "Roger Frutos",
+      "source": "wikipedia",
+      "attrs": {
+        "sentiment": "neutral",
+        "salience": 0.05,
+        "aliases": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "sars_cov_2__originated from__bats",
+      "src": "sars_cov_2",
+      "dst": "bats",
+      "type": "relation",
+      "label": "originated from",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "spread to human populations through natural zoonotic transmission from bats"
+      }
+    },
+    {
+      "id": "sars_cov_2__transmitted to humans via__intermediate_hosts",
+      "src": "sars_cov_2",
+      "dst": "intermediate_hosts",
+      "type": "relation",
+      "label": "transmitted to humans via",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "transmitted to humans through infected wild animals serving as intermediate hosts"
+      }
+    },
+    {
+      "id": "huanan_seafood_market__is location of__early_infections",
+      "src": "huanan_seafood_market",
+      "dst": "early_infections",
+      "type": "relation",
+      "label": "is location of",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "first known human infections from SARS-CoV-2 were discovered in Wuhan at Huanan Seafood Market"
+      }
+    },
+    {
+      "id": "wuhan_institute_of_virology__is near__huanan_seafood_market",
+      "src": "wuhan_institute_of_virology",
+      "dst": "huanan_seafood_market",
+      "type": "relation",
+      "label": "is near",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "located within miles of the original focal point of the pandemic"
+      }
+    },
+    {
+      "id": "lab_leak_theory__suggests origin from__laboratory",
+      "src": "lab_leak_theory",
+      "dst": "laboratory",
+      "type": "relation",
+      "label": "suggests origin from",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "hypothesis that SARS-CoV-2 originated from a laboratory"
+      }
+    },
+    {
+      "id": "lab_leak_theory__lacks__evidence",
+      "src": "lab_leak_theory",
+      "dst": "evidence",
+      "type": "relation",
+      "label": "lacks",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "no evidence supporting laboratory involvement"
+      }
+    },
+    {
+      "id": "lab_leak_theory__is considered__conspiracy_theory",
+      "src": "lab_leak_theory",
+      "dst": "conspiracy_theory",
+      "type": "relation",
+      "label": "is considered",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "many scenarios proposed for a lab leak are characteristic of conspiracy theories"
+      }
+    },
+    {
+      "id": "world_health_organization__deems unlikely__lab_leak",
+      "src": "world_health_organization",
+      "dst": "lab_leak",
+      "type": "relation",
+      "label": "deems unlikely",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "deemed the possibility 'extremely unlikely'"
+      }
+    },
+    {
+      "id": "china__rejected__laboratory_audits",
+      "src": "china",
+      "dst": "laboratory_audits",
+      "type": "relation",
+      "label": "rejected",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "subsequent plans for laboratory audits were rejected by China"
+      }
+    },
+    {
+      "id": "sars_cov_2__shares similarity with__ratg13",
+      "src": "sars_cov_2",
+      "dst": "ratg13",
+      "type": "relation",
+      "label": "shares similarity with",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "RaTG13 has a 96% resemblance to SARS-CoV-2"
+      }
+    },
+    {
+      "id": "bats__are reservoir of__betacoronaviruses",
+      "src": "bats",
+      "dst": "betacoronaviruses",
+      "type": "relation",
+      "label": "are reservoir of",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "bats, a large reservoir of betacoronaviruses"
+      }
+    },
+    {
+      "id": "lab_leak_theory__gained popularity in__united_states",
+      "src": "lab_leak_theory",
+      "dst": "united_states",
+      "type": "relation",
+      "label": "gained popularity in",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "gained popularity in the United States through promotion by conservative personalities"
+      }
+    },
+    {
+      "id": "wuhan_institute_of_virology__conducted research on__sars_like_bat_coronaviruses",
+      "src": "wuhan_institute_of_virology",
+      "dst": "sars_like_bat_coronaviruses",
+      "type": "relation",
+      "label": "conducted research on",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "conducting research on SARS-like bat coronaviruses since 2005"
+      }
+    },
+    {
+      "id": "lab_leak_theory__increases__anti_chinese_sentiment",
+      "src": "lab_leak_theory",
+      "dst": "anti_chinese_sentiment",
+      "type": "relation",
+      "label": "increases",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "leveraged and increased anti-Chinese sentiment"
+      }
+    },
+    {
+      "id": "scientists__support__zoonosis_origin",
+      "src": "scientists",
+      "dst": "zoonosis_origin",
+      "type": "relation",
+      "label": "support",
+      "source": "wikipedia",
+      "attrs": {
+        "evidence_span": "most scientists believe it spread to human populations through natural zoonotic transmission"
+      }
+    }
+  ],
+  "stats": {
+    "node_count": 18,
+    "edge_count": 15
+  }
+}

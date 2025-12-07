@@ -1,0 +1,195 @@
+{
+  "entity_overlap": {
+    "jaccard": 0.0645,
+    "intersection": [
+      "ratg13",
+      "sars_cov_2"
+    ],
+    "grok_unique": [
+      "cia",
+      "covid_19_lab_leak_theory",
+      "department_of_energy",
+      "ecohealth_alliance",
+      "fbi",
+      "germany_s_foreign_intelligence_service",
+      "huanan_seafood_wholesale_market",
+      "niaid",
+      "shi_zhengli",
+      "u_s_house_subcommittee",
+      "wuhan_china",
+      "wuhan_institute_of_virology_wiv",
+      "yunnan_province"
+    ],
+    "wiki_unique": [
+      "banal_52",
+      "bats",
+      "china",
+      "covid_19",
+      "danielle_anderson",
+      "huanan_seafood_market",
+      "lab_leak_theory",
+      "marc_lipsitch",
+      "ralph_baric",
+      "richard_ebright",
+      "roger_frutos",
+      "stephan_lewandowsky",
+      "world_health_organization",
+      "wuhan",
+      "wuhan_institute_of_virology",
+      "zoonosis"
+    ]
+  },
+  "edge_overlap": {
+    "jaccard": 0.0,
+    "intersection": [],
+    "grok_unique": [
+      [
+        "cia",
+        "shifted to",
+        "lab_leak_more_likely_in_2025"
+      ],
+      [
+        "covid_19_lab_leak_theory",
+        "hypothesizes",
+        "sars_cov_2_originated_from_wuhan_institute_of_virology"
+      ],
+      [
+        "department_of_energy",
+        "assessed",
+        "lab_origin_with_low_confidence"
+      ],
+      [
+        "ecohealth_alliance",
+        "funded",
+        "bat_coronavirus_research_at_wiv"
+      ],
+      [
+        "fbi",
+        "concluded",
+        "lab_origin_with_moderate_confidence"
+      ],
+      [
+        "germany_s_foreign_intelligence",
+        "estimated",
+        "80_90_probability_of_lab_accident"
+      ],
+      [
+        "h1n1_influenza_a_virus",
+        "reemerged due to",
+        "laboratory_leak_in_1977"
+      ],
+      [
+        "sars_cov_2",
+        "emerged in",
+        "wuhan_china"
+      ],
+      [
+        "sars_cov_2",
+        "has",
+        "furin_cleavage_site"
+      ],
+      [
+        "u_s_house_subcommittee",
+        "affirmed",
+        "lab_leak_as_most_probable_origin"
+      ],
+      [
+        "wiv",
+        "reported",
+        "biosafety_concerns"
+      ],
+      [
+        "wiv",
+        "took offline",
+        "public_database_of_viral_samples"
+      ],
+      [
+        "wiv_researchers",
+        "experienced",
+        "illnesses_in_late_2019"
+      ],
+      [
+        "wuhan_institute_of_virology",
+        "conducted research on",
+        "bat_coronaviruses"
+      ]
+    ],
+    "wiki_unique": [
+      [
+        "bats",
+        "are reservoir of",
+        "betacoronaviruses"
+      ],
+      [
+        "china",
+        "rejected",
+        "laboratory_audits"
+      ],
+      [
+        "huanan_seafood_market",
+        "is location of",
+        "early_infections"
+      ],
+      [
+        "lab_leak_theory",
+        "gained popularity in",
+        "united_states"
+      ],
+      [
+        "lab_leak_theory",
+        "increases",
+        "anti_chinese_sentiment"
+      ],
+      [
+        "lab_leak_theory",
+        "is considered",
+        "conspiracy_theory"
+      ],
+      [
+        "lab_leak_theory",
+        "lacks",
+        "evidence"
+      ],
+      [
+        "lab_leak_theory",
+        "suggests origin from",
+        "laboratory"
+      ],
+      [
+        "sars_cov_2",
+        "originated from",
+        "bats"
+      ],
+      [
+        "sars_cov_2",
+        "shares similarity with",
+        "ratg13"
+      ],
+      [
+        "sars_cov_2",
+        "transmitted to humans via",
+        "intermediate_hosts"
+      ],
+      [
+        "scientists",
+        "support",
+        "zoonosis_origin"
+      ],
+      [
+        "world_health_organization",
+        "deems unlikely",
+        "lab_leak"
+      ],
+      [
+        "wuhan_institute_of_virology",
+        "conducted research on",
+        "sars_like_bat_coronaviruses"
+      ],
+      [
+        "wuhan_institute_of_virology",
+        "is near",
+        "huanan_seafood_market"
+      ]
+    ]
+  }
+}

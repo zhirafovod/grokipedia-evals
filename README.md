@@ -132,6 +132,23 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - If `data/artifacts/<topic>/analysis.json` exists (run the extractor), the UI will show entities, entity overlap, and relation graphs for both sources.
 - Diff/insights: the UI also shows common/unique entities, linked-text hover highlighting, cosine entity matches, sentiment divergence, unified graph, and LLM-judged bias metrics.
 
+## Graphs, metrics, and embeddings
+
+- Generate graphs/comparison/embeddings from analysis: `python scripts/generate_graphs.py --topic COVID-19_lab_leak_theory`
+- Outputs: `grokipedia_graph.json`, `wikipedia_graph.json`, `comparison.json`, `embeddings.json` under `data/artifacts/<topic>/`.
+
+## FastAPI server
+
+- Serve artifacts locally: `uvicorn server.main:app --reload`
+- Endpoints:
+  - `GET /api/topics`
+  - `GET /api/topic/{topic}/raw`
+  - `GET /api/topic/{topic}/analysis`
+  - `GET /api/topic/{topic}/graphs`
+  - `GET /api/topic/{topic}/comparison`
+  - `GET /api/topic/{topic}/embeddings`
+  - `POST /api/topic/{topic}/recompute` (runs graph generation)
+
 ## Extraction & scoring (xAI SDK)
 
 - Ensure `.env` has `XAI_API_KEY` (already provided) and your venv is active.
