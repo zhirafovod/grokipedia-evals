@@ -119,8 +119,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [x] Build layout shell (header with topic selector + recompute, dual panes, metrics/sidebar, embeddings preview).
    - [x] Establish basic design tokens + palettes; reusable primitives (Card, Pill).
    - [x] Add inline segment highlights from `segments.json` + search box hitting backend search endpoint.
-   - [x] Add entity selection from search with highlight emphasis in text panes; salience filter slider for highlight gating.
-   - [ ] Compose `CompareView` with richer filter context, loading/error states, and component wiring for diff/graphs.
+   - [x] Add entity selection from search with highlight emphasis in text panes; salience filter slider for highlight gating; data status panel.
+   - [ ] Compose `CompareView` with richer filter context and component wiring for diff/graphs.
 
 4. [ ] Text highlighting & diff
    - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).

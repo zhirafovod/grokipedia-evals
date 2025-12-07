@@ -284,6 +284,15 @@ button:disabled {
   letter-spacing: 0.04em;
 }
 
+.pill.success {
+  color: #a7f3d0;
+  border-color: rgba(110, 231, 183, 0.6);
+}
+
+.pill.muted {
+  color: var(--muted);
+}
+
 .pill.active {
   display: inline-flex;
   align-items: center;
@@ -316,6 +325,24 @@ button:disabled {
 .filter label {
   font-size: 13px;
   color: var(--muted);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.status-row:last-child {
+  border-bottom: none;
+}
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pill.warning {

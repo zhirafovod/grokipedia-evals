@@ -39,6 +39,37 @@ type Segment = {
 
 type SelectedEntity = { name: string; source?: string; type?: string } | null;
 
+function StatusRow({
+  label,
+  loading,
+  error,
+  ok,
+}: {
+  label: string;
+  loading: boolean;
+  error?: unknown;
+  ok: boolean;
+}) {
+  let text = "OK";
+  let className = "pill success";
+  if (loading) {
+    text = "Loading…";
+    className = "pill muted";
+  } else if (error) {
+    text = "Error";
+    className = "pill warning";
+  } else if (!ok) {
+    text = "Missing";
+    className = "pill warning";
+  }
+  return (
+    <div className="status-row">
+      <span>{label}</span>
+      <span className={className}>{text}</span>
+    </div>
+  );
+}
+
 function SelectTopic({
   topics,
   selected,
@@ -262,32 +293,32 @@ function App() {
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(null);
   const [salienceThreshold, setSalienceThreshold] = useState(0);
 
-  const { data: raw, isLoading: loadingRaw } = useQuery({
+  const { data: raw, isLoading: loadingRaw, error: rawError } = useQuery({
     queryKey: ["raw", topic],
     queryFn: () => fetchRaw(topic!),
     enabled: !!topic,
   });
-  const { data: analysis } = useQuery({
+  const { data: analysis, error: analysisError } = useQuery({
     queryKey: ["analysis", topic],
     queryFn: () => fetchAnalysis(topic!),
     enabled: !!topic,
   });
-  const { data: comparison } = useQuery({
+  const { data: comparison, error: comparisonError } = useQuery({
     queryKey: ["comparison", topic],
     queryFn: () => fetchComparison(topic!),
     enabled: !!topic,
   });
-  const { data: graphs } = useQuery({
+  const { data: graphs, error: graphsError } = useQuery({
     queryKey: ["graphs", topic],
     queryFn: () => fetchGraphs(topic!),
     enabled: !!topic,
   });
-  const { data: embeddings } = useQuery({
+  const { data: embeddings, error: embeddingsError } = useQuery({
     queryKey: ["embeddings", topic],
     queryFn: () => fetchEmbeddings(topic!),
     enabled: !!topic,
   });
-  const { data: segments, isError: segmentsMissing } = useQuery({
+  const { data: segments, isError: segmentsMissing, error: segmentsError } = useQuery({
     queryKey: ["segments", topic],
     queryFn: () => fetchSegments(topic!),
     enabled: !!topic,
@@ -410,6 +441,17 @@ function App() {
           </div>
 
           <div className="side-column">
+            <Card title="Data status">
+              <div className="status-list">
+                <StatusRow label="Raw" loading={loadingRaw} error={rawError} ok={!!raw} />
+                <StatusRow label="Analysis" loading={!analysis && !analysisError && !!topic} error={analysisError} ok={!!analysis} />
+                <StatusRow label="Graphs" loading={!graphs && !graphsError && !!topic} error={graphsError} ok={!!graphs} />
+                <StatusRow label="Comparison" loading={!comparison && !comparisonError && !!topic} error={comparisonError} ok={!!comparison} />
+                <StatusRow label="Embeddings" loading={!embeddings && !embeddingsError && !!topic} error={embeddingsError} ok={!!embeddings} />
+                <StatusRow label="Segments" loading={!segments && !segmentsError && !!topic} error={segmentsError} ok={!!segments} />
+              </div>
+            </Card>
+
             <Card title="Key metrics">
               <MetricsPanel comparison={comparison} graphs={graphs} />
             </Card>
