@@ -115,6 +115,13 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - `Metrics`: Overlap (entity Jaccard), sentiment divergence, loaded-language frequency, omission heuristics.
 - `Outputs`: JSON (graphs, metrics), CSV/Parquet (tables), optional Atlas map config.
 
+## Quickstart: Fetch one article pair
+
+- Install Python deps: `python -m pip install -r requirements.txt`
+- Download Grokipedia + Wikipedia texts into `data/raw/<topic>/`: `python scripts/download_pair.py --grok-url https://grokipedia.com/page/COVID-19_lab_leak_theory --wiki https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory`
+- Outputs land in `data/raw/<topic>/`: `grokipedia.txt` (or `.md` with `--keep-markdown`), `wikipedia.txt`, `metadata.json`.
+- Repeat for other topics (e.g., Transgender, Critical_race_theory) to build the MVP dataset.
+
 ## Two-Page MVP
 
 - `Page: Grokipedia`
@@ -140,3 +147,8 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - Scaffold `server` (FastAPI + requirements.txt) and `app` (Vite React).
 - Implement precompute CLI for the two selected articles.
 - Wire frontend to load `data/artifacts/*.json` and render graphs and metrics.
+
+## Changelog
+
+- 2024-12-21: Added `requirements.txt` and updated README quickstart/install instructions.
+- 2024-12-20: Added `scripts/download_pair.py` to fetch Grokipedia + Wikipedia pairs and documented the quickstart command/output structure.
