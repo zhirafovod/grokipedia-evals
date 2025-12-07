@@ -213,6 +213,11 @@ button:disabled {
   border-radius: 4px;
 }
 
+.highlight-active {
+  background: linear-gradient(120deg, rgba(110, 231, 183, 0.35), rgba(96, 165, 250, 0.3));
+  outline: 1px solid rgba(110, 231, 183, 0.6);
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -277,6 +282,40 @@ button:disabled {
   margin-right: 6px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.pill.active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tiny {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter label {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .pill.warning {

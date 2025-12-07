@@ -37,6 +37,8 @@ type Segment = {
   metrics?: Record<string, any>;
 };
 
+type SelectedEntity = { name: string; source?: string; type?: string } | null;
+
 function SelectTopic({
   topics,
   selected,
@@ -73,11 +75,27 @@ function Card({ title, children, actions }: { title: string; children: React.Rea
   );
 }
 
-function HighlightedSegment({ segment, index }: { segment: Segment; index: number }) {
+function HighlightedSegment({
+  segment,
+  index,
+  selectedName,
+  salienceThreshold,
+}: {
+  segment: Segment;
+  index: number;
+  selectedName?: string;
+  salienceThreshold: number;
+}) {
   const { text = "", entities = [], start = 0 } = segment;
   const parts = useMemo(() => {
     const normalized = entities
-      .filter((e) => typeof e.start === "number" && typeof e.end === "number" && (e.start ?? 0) < (e.end ?? 0))
+      .filter((e) => {
+        const sal = typeof e.salience === "number" ? e.salience : undefined;
+        if (salienceThreshold > 0 && sal !== undefined && sal < salienceThreshold) {
+          return false;
+        }
+        return typeof e.start === "number" && typeof e.end === "number" && (e.start ?? 0) < (e.end ?? 0);
+      })
       .sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
     const nodes: React.ReactNode[] = [];
     let cursor = 0;
@@ -92,7 +110,7 @@ function HighlightedSegment({ segment, index }: { segment: Segment; index: numbe
         nodes.push(
           <span
             key={`${segment.id}-${ent.name}-${relStart}`}
-            className="highlight"
+            className={`highlight${selectedName && ent.name?.toLowerCase() === selectedName.toLowerCase() ? " highlight-active" : ""}`}
             title={`${ent.name}${ent.type ? ` (${ent.type})` : ""}`}
           >
             {slice}
@@ -120,7 +138,21 @@ function HighlightedSegment({ segment, index }: { segment: Segment; index: numbe
   );
 }
 
-function TextPane({ title, text, loading, segments }: { title: string; text?: string; loading?: boolean; segments?: Segment[] }) {
+function TextPane({
+  title,
+  text,
+  loading,
+  segments,
+  selectedName,
+  salienceThreshold,
+}: {
+  title: string;
+  text?: string;
+  loading?: boolean;
+  segments?: Segment[];
+  selectedName?: string;
+  salienceThreshold: number;
+}) {
   const paragraphs = (text || "").split(/\n\n+/).filter(Boolean);
   const hasSegments = segments && segments.length > 0;
   return (
@@ -130,7 +162,13 @@ function TextPane({ title, text, loading, segments }: { title: string; text?: st
       {!loading && hasSegments && (
         <div className="segment-scroll">
           {segments!.map((seg, idx) => (
-            <HighlightedSegment key={seg.id} segment={seg} index={idx} />
+            <HighlightedSegment
+              key={seg.id}
+              segment={seg}
+              index={idx}
+              selectedName={selectedName}
+              salienceThreshold={salienceThreshold}
+            />
           ))}
         </div>
       )}
@@ -221,6 +259,8 @@ function App() {
   const { data: topics = [], isLoading: loadingTopics } = useQuery({ queryKey: ["topics"], queryFn: fetchTopics });
   const { topic, setTopic } = useTopicSelection(topics);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(null);
+  const [salienceThreshold, setSalienceThreshold] = useState(0);
 
   const { data: raw, isLoading: loadingRaw } = useQuery({
     queryKey: ["raw", topic],
@@ -294,7 +334,14 @@ function App() {
           {metaLine && <div className="muted">{metaLine}</div>}
         </div>
         <div className="header-actions">
-          <SelectTopic topics={topics} selected={topic} onChange={setTopic} />
+          <SelectTopic
+            topics={topics}
+            selected={topic}
+            onChange={(t) => {
+              setSelectedEntity(null);
+              setTopic(t);
+            }}
+          />
           <div className="search">
             <input
               type="search"
@@ -303,6 +350,14 @@ function App() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          {selectedEntity && (
+            <div className="pill active">
+              {selectedEntity.name}
+              <button className="tiny" onClick={() => setSelectedEntity(null)} title="Clear selection">
+                ✕
+              </button>
+            </div>
+          )}
           <button
             disabled={!topic || recompute.isPending}
             onClick={() => recompute.mutate()}
@@ -335,12 +390,16 @@ function App() {
                   text={raw?.grokipedia}
                   loading={loadingRaw}
                   segments={segments?.segments?.grokipedia as Segment[] | undefined}
+                  selectedName={selectedEntity?.name}
+                  salienceThreshold={salienceThreshold}
                 />
                 <TextPane
                   title="Wikipedia"
                   text={raw?.wikipedia}
                   loading={loadingRaw}
                   segments={segments?.segments?.wikipedia as Segment[] | undefined}
+                  selectedName={selectedEntity?.name}
+                  salienceThreshold={salienceThreshold}
                 />
               </div>
             </Card>
@@ -353,6 +412,21 @@ function App() {
           <div className="side-column">
             <Card title="Key metrics">
               <MetricsPanel comparison={comparison} graphs={graphs} />
+            </Card>
+
+            <Card title="Filters">
+              <div className="filter">
+                <label htmlFor="salience">Highlight salience ≥ {salienceThreshold.toFixed(2)}</label>
+                <input
+                  id="salience"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={salienceThreshold}
+                  onChange={(e) => setSalienceThreshold(parseFloat(e.target.value))}
+                />
+              </div>
             </Card>
 
             <Card title="Overlap details">
@@ -423,7 +497,11 @@ function App() {
                   {searchResults?.results?.length ? (
                     <ul>
                       {searchResults.results.map((r: any) => (
-                        <li key={`${r.source}-${r.id}`}>
+                        <li
+                          key={`${r.source}-${r.id}`}
+                          className="clickable"
+                          onClick={() => setSelectedEntity({ name: r.label, source: r.source, type: r.type })}
+                        >
                           <span className="pill">{r.source}</span>
                           <strong>{r.label}</strong>
                           <span className="muted">
