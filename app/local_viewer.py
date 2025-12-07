@@ -199,7 +199,7 @@ def build_highlight_html(text: str, entity_names: set[str], source: str, max_hit
         counts[canon] = counts.get(canon, 0) + 1
         if counts[canon] <= max_hits_per_entity and canon in canon_entities:
             escaped_segments.append(
-                f"<span class='entity entity-{source}' data-entity='{canon}'>{html.escape(raw)}</span>"
+                f"<span class='entity entity-{source}' data-entity='{canon}' data-source='{source}'>{html.escape(raw)}</span>"
             )
         else:
             escaped_segments.append(html.escape(raw))
@@ -220,6 +220,35 @@ def render_linked_text(analysis: Dict[str, Any], grok_text: str, wiki_text: str)
     wiki_entities = analysis.get("articles", {}).get("wikipedia", {}).get("entities", [])
     grok_names = {e.get("name", "") for e in grok_entities if canonical_name(e.get("name", "")) in common}
     wiki_names = {e.get("name", "") for e in wiki_entities if canonical_name(e.get("name", "")) in common}
+
+    # Build per-entity metrics map
+    metrics_map: Dict[str, Dict[str, object]] = {}
+    for ent in grok_entities:
+        key = canonical_name(ent.get("name", ""))
+        if key in common:
+            metrics_map.setdefault(key, {})
+            metrics_map[key]["grok_sentiment"] = ent.get("sentiment", "")
+            metrics_map[key]["grok_salience"] = ent.get("salience", "")
+    for ent in wiki_entities:
+        key = canonical_name(ent.get("name", ""))
+        if key in common:
+            metrics_map.setdefault(key, {})
+            metrics_map[key]["wiki_sentiment"] = ent.get("sentiment", "")
+            metrics_map[key]["wiki_salience"] = ent.get("salience", "")
+    sim_matches = (analysis.get("metrics", {}).get("entity_similarity", {}) or {}).get("matches", []) or []
+    for m in sim_matches:
+        gkey = canonical_name(m.get("grok_entity", ""))
+        wkey = canonical_name(m.get("wiki_entity", ""))
+        if gkey == wkey and gkey:
+            metrics_map.setdefault(gkey, {})
+            metrics_map[gkey]["cosine"] = m.get("score")
+        else:
+            if gkey:
+                metrics_map.setdefault(gkey, {})
+                metrics_map[gkey].setdefault("cosine_links", []).append(m)
+            if wkey:
+                metrics_map.setdefault(wkey, {})
+                metrics_map[wkey].setdefault("cosine_links", []).append(m)
 
     grok_html = build_highlight_html(grok_text, grok_names, "grok")
     wiki_html = build_highlight_html(wiki_text, wiki_names, "wiki")
@@ -261,6 +290,14 @@ def render_linked_text(analysis: Dict[str, Any], grok_text: str, wiki_text: str)
         outline: 2px solid #10b981;
         background: #d1fae5 !important;
     }}
+    .metrics-box {{
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #f9fafb;
+        font-size: 13px;
+    }}
     </style>
     <div class="linked-container">
         <div class="panel">
@@ -272,16 +309,32 @@ def render_linked_text(analysis: Dict[str, Any], grok_text: str, wiki_text: str)
             {wiki_html}
         </div>
     </div>
+    <div class="metrics-box" id="metrics-box">Hover an entity to see metrics...</div>
     <script>
     const spans = document.querySelectorAll('.entity');
+    const metrics = {json.dumps(metrics_map)};
+    const metricsBox = document.getElementById('metrics-box');
     spans.forEach(span => {{
         span.addEventListener('mouseenter', () => {{
             const key = span.dataset.entity;
             document.querySelectorAll(`[data-entity="${{key}}"]`).forEach(el => el.classList.add('hovered'));
+            const m = metrics[key] || {{}};
+            const grokSent = m.grok_sentiment || 'n/a';
+            const wikiSent = m.wiki_sentiment || 'n/a';
+            const grokSal = m.grok_salience ?? 'n/a';
+            const wikiSal = m.wiki_salience ?? 'n/a';
+            const cosine = m.cosine ?? 'n/a';
+            metricsBox.innerHTML = `
+                <div><strong>Entity:</strong> ${{key}}</div>
+                <div>Grok sentiment: ${{grokSent}}, salience: ${{grokSal}}</div>
+                <div>Wiki sentiment: ${{wikiSent}}, salience: ${{wikiSal}}</div>
+                <div>Cosine alignment: ${{cosine}}</div>
+            `;
         }});
         span.addEventListener('mouseleave', () => {{
             const key = span.dataset.entity;
             document.querySelectorAll(`[data-entity="${{key}}"]`).forEach(el => el.classList.remove('hovered'));
+            metricsBox.innerHTML = "Hover an entity to see metrics...";
         }});
     }});
     </script>
