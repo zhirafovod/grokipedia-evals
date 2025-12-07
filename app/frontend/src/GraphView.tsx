@@ -54,7 +54,7 @@ export function GraphView({
 
     const processGraph = (graph: Graph, source: string) => {
       const nodeIds = new Set(graph.nodes.map(n => n.id));
-      graph.nodes.forEach((node) => {
+      graph.nodes.forEach((node, idx) => {
         allNodes.push({
           data: {
             id: `${source}-${node.id}`,
@@ -64,6 +64,7 @@ export function GraphView({
             sentiment: node.attrs?.sentiment,
             salience: node.attrs?.salience,
           },
+          position: { x: (idx % 10) * 100 + Math.random() * 50, y: Math.floor(idx / 10) * 100 + Math.random() * 50 }, // Initial positions to spread nodes
           classes: source,
         });
       });

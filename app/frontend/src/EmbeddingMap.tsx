@@ -47,13 +47,24 @@ function scalePoints(points: EmbeddingPoint[], width: number, height: number, pa
   }));
 }
 
+type Graph = {
+  nodes: { id: string; label: string; type: string; attrs?: { sentiment?: string; salience?: number } }[];
+  edges: { src: string; dst: string; label?: string; attrs?: { confidence?: number } }[];
+};
+
 export function EmbeddingMap({
   points,
+  grokGraph,
+  wikiGraph,
+  merged = false,
   selectedName,
   onSelect,
   salienceThreshold,
 }: {
   points: EmbeddingPoint[];
+  grokGraph?: Graph;
+  wikiGraph?: Graph;
+  merged?: boolean;
   selectedName?: string;
   onSelect: (name: string, source?: string, type?: string) => void;
   salienceThreshold: number;
@@ -72,6 +83,37 @@ export function EmbeddingMap({
   }, [points, salienceThreshold, showGrok, showWiki]);
 
   const scaled = useMemo(() => scalePoints(filtered, 620, 360), [filtered]);
+  const pointMap = useMemo(() => {
+    const map: Record<string, { sx: number; sy: number; source: string; type: string }> = {};
+    scaled.forEach((p) => {
+      map[p.id] = { sx: p.sx, sy: p.sy, source: p.source, type: p.type };
+    });
+    return map;
+  }, [scaled]);
+
+  const edgesToDraw = useMemo(() => {
+    if (!merged) return [];
+    const lines: { x1: number; y1: number; x2: number; y2: number; source: string }[] = [];
+    const processGraph = (graph: Graph, source: string) => {
+      graph.edges.forEach((edge) => {
+        const srcPos = pointMap[edge.src];
+        const dstPos = pointMap[edge.dst];
+        if (srcPos && dstPos) {
+          lines.push({
+            x1: srcPos.sx,
+            y1: srcPos.sy,
+            x2: dstPos.sx,
+            y2: dstPos.sy,
+            source,
+          });
+        }
+      });
+    };
+    if (grokGraph) processGraph(grokGraph, "grokipedia");
+    if (wikiGraph) processGraph(wikiGraph, "wikipedia");
+    return lines;
+  }, [merged, grokGraph, wikiGraph, pointMap]);
+
   const clusters = useMemo(() => {
     const k = Math.max(2, Math.min(8, Math.round(Math.sqrt(Math.max(1, scaled.length) / 4))));
     if (scaled.length === 0) return [];
@@ -163,6 +205,18 @@ export function EmbeddingMap({
             </g>
           ) : null
         )}
+        {edgesToDraw.map((edge, idx) => (
+          <line
+            key={`edge-${idx}`}
+            x1={edge.x1}
+            y1={edge.y1}
+            x2={edge.x2}
+            y2={edge.y2}
+            stroke={edge.source === "grokipedia" ? "#60a5fa" : "#f97316"}
+            strokeWidth={1}
+            opacity={0.5}
+          />
+        ))}
         {scaled.map((p) => {
           const isSelected = selectedLower && p.label.toLowerCase() === selectedLower;
           const fill = SOURCE_COLORS[p.source] || "#94a3b8";

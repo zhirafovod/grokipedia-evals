@@ -579,6 +579,9 @@ function CompareApp() {
             <Card title="Embedding map">
               <EmbeddingMap
                 points={(embeddings?.points as EmbeddingPoint[]) || []}
+                grokGraph={graphs?.grokipedia}
+                wikiGraph={graphs?.wikipedia}
+                merged={showMergedGraph}
                 selectedName={selectedEntity?.name}
                 onSelect={(label, source, type) => setSelectedEntity({ name: label, source, type })}
                 salienceThreshold={salienceThreshold}
