@@ -7,9 +7,9 @@ This document reviews the current implementation, identifies missing gaps for a 
 **Current state**
 - `scripts/` provide data acquisition (`download_pair.py`, `grokipedia-crawler.py`) and extraction (`run_extraction.py`) producing `data/artifacts/<topic>/analysis.json`.
 - Graph generation + embeddings: `scripts/generate_graphs.py` builds per-source graphs, comparison, and `embeddings.json` (SentenceTransformer + PCA).
-- Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, segments (fallback paragraphs), search, and recompute.
+- Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, segments (generated + fallback), search, and recompute.
 - Segmentation: `scripts/generate_segments.py` emits `segments.json` (paragraph-level with entity spans); server serves it and falls back to paragraphs if missing.
-- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action, segment counts); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
+- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action, segment counts, inline highlights); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
 - `plans/Graph.md` defines graph schema, metrics, and comparison outputs.
 
 **Gaps**
@@ -118,7 +118,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [x] Scaffold React/Vite + React Query fetching topics/raw/analysis/graphs/comparison/embeddings/segments (fallback).
    - [x] Build layout shell (header with topic selector + recompute, dual panes, metrics/sidebar, embeddings preview).
    - [x] Establish basic design tokens + palettes; reusable primitives (Card, Pill).
-   - [ ] Compose `CompareView` with selection/filter context, loading/error states, and component wiring for highlights/graphs.
+   - [x] Add inline segment highlights from `segments.json`.
+   - [ ] Compose `CompareView` with selection/filter context, loading/error states, and component wiring for diff/graphs.
 
 4. [ ] Text highlighting & diff
    - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).

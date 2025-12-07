@@ -17,6 +17,25 @@ type Graphs = {
   wikipedia?: { stats?: GraphStats };
 };
 
+type EntitySpan = {
+  name: string;
+  type?: string;
+  start?: number;
+  end?: number;
+  salience?: number;
+  sentiment?: string;
+};
+
+type Segment = {
+  id: string;
+  source: string;
+  text: string;
+  start?: number;
+  end?: number;
+  entities?: EntitySpan[];
+  metrics?: Record<string, any>;
+};
+
 function SelectTopic({
   topics,
   selected,
@@ -53,14 +72,69 @@ function Card({ title, children, actions }: { title: string; children: React.Rea
   );
 }
 
-function TextPane({ title, text, loading }: { title: string; text?: string; loading?: boolean }) {
+function HighlightedSegment({ segment, index }: { segment: Segment; index: number }) {
+  const { text = "", entities = [], start = 0 } = segment;
+  const parts = useMemo(() => {
+    const normalized = entities
+      .filter((e) => typeof e.start === "number" && typeof e.end === "number" && (e.start ?? 0) < (e.end ?? 0))
+      .sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
+    const nodes: React.ReactNode[] = [];
+    let cursor = 0;
+    for (const ent of normalized) {
+      const relStart = (ent.start ?? 0) - start;
+      const relEnd = (ent.end ?? 0) - start;
+      if (relStart > cursor) {
+        nodes.push(text.slice(cursor, relStart));
+      }
+      if (relStart >= 0 && relStart < text.length && relEnd > relStart) {
+        const slice = text.slice(relStart, Math.min(relEnd, text.length));
+        nodes.push(
+          <span
+            key={`${segment.id}-${ent.name}-${relStart}`}
+            className="highlight"
+            title={`${ent.name}${ent.type ? ` (${ent.type})` : ""}`}
+          >
+            {slice}
+          </span>
+        );
+        cursor = Math.min(relEnd, text.length);
+      }
+    }
+    if (cursor < text.length) {
+      nodes.push(text.slice(cursor));
+    }
+    return nodes;
+  }, [entities, segment.id, start, text]);
+
+  const mentionCount = segment.metrics?.entity_mentions ?? entities.length;
+
+  return (
+    <div className="segment-block">
+      <div className="segment-meta">
+        <span>Segment {index + 1}</span>
+        <span className="muted">{mentionCount} mentions</span>
+      </div>
+      <div className="segment-text">{parts}</div>
+    </div>
+  );
+}
+
+function TextPane({ title, text, loading, segments }: { title: string; text?: string; loading?: boolean; segments?: Segment[] }) {
   const paragraphs = (text || "").split(/\n\n+/).filter(Boolean);
+  const hasSegments = segments && segments.length > 0;
   return (
     <div className="text-pane">
       <div className="pane-title">{title}</div>
       {loading && <div className="muted">Loading…</div>}
-      {!loading && paragraphs.length === 0 && <div className="muted">No text available.</div>}
-      {!loading && paragraphs.length > 0 && (
+      {!loading && hasSegments && (
+        <div className="segment-scroll">
+          {segments!.map((seg, idx) => (
+            <HighlightedSegment key={seg.id} segment={seg} index={idx} />
+          ))}
+        </div>
+      )}
+      {!loading && !hasSegments && paragraphs.length === 0 && <div className="muted">No text available.</div>}
+      {!loading && !hasSegments && paragraphs.length > 0 && (
         <div className="text-scroll">
           {paragraphs.map((p, idx) => (
             <p key={idx}>{p}</p>
@@ -240,8 +314,18 @@ function App() {
               }
             >
               <div className="split">
-                <TextPane title="Grokipedia" text={raw?.grokipedia} loading={loadingRaw} />
-                <TextPane title="Wikipedia" text={raw?.wikipedia} loading={loadingRaw} />
+                <TextPane
+                  title="Grokipedia"
+                  text={raw?.grokipedia}
+                  loading={loadingRaw}
+                  segments={segments?.segments?.grokipedia as Segment[] | undefined}
+                />
+                <TextPane
+                  title="Wikipedia"
+                  text={raw?.wikipedia}
+                  loading={loadingRaw}
+                  segments={segments?.segments?.wikipedia as Segment[] | undefined}
+                />
               </div>
             </Card>
 
