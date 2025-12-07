@@ -15,6 +15,8 @@ import {
 } from "./api";
 import { CompareProvider, useCompareControls } from "./CompareContext";
 import { EmbeddingMap, EmbeddingPoint } from "./EmbeddingMap";
+import { GraphView } from "./GraphView";
+import { Heatmap } from "./Heatmap";
 
 type GraphStats = { node_count?: number; edge_count?: number };
 type Graphs = {
@@ -383,6 +385,8 @@ function CompareApp() {
     setShowHighlights,
     showDiff,
     setShowDiff,
+    showMergedGraph,
+    setShowMergedGraph,
     isRecomputing,
     setIsRecomputing,
   } = useCompareControls();
@@ -581,6 +585,20 @@ function CompareApp() {
               />
             </Card>
 
+            <Card title="Knowledge graph">
+              <GraphView
+                grokGraph={graphs?.grokipedia}
+                wikiGraph={graphs?.wikipedia}
+                merged={showMergedGraph}
+                selectedName={selectedEntity?.name}
+                onSelect={(label, source, type) => setSelectedEntity({ name: label, source, type })}
+              />
+            </Card>
+
+            <Card title="Bias heatmap">
+              <Heatmap analysis={analysis} />
+            </Card>
+
             {showDiff && (
               <Card title="Diff view">
                 <DiffView left={raw?.grokipedia || ""} right={raw?.wikipedia || ""} />
@@ -636,6 +654,10 @@ function CompareApp() {
                 <div className="switch-row">
                   <span>Show diff view</span>
                   <input type="checkbox" checked={showDiff} onChange={(e) => setShowDiff(e.target.checked)} />
+                </div>
+                <div className="switch-row">
+                  <span>Merged graph view</span>
+                  <input type="checkbox" checked={showMergedGraph} onChange={(e) => setShowMergedGraph(e.target.checked)} />
                 </div>
               </div>
             </Card>

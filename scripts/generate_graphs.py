@@ -16,7 +16,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from sklearn.decomposition import PCA
+import umap
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_ARTIFACTS = ROOT / "data" / "artifacts"
@@ -135,8 +135,8 @@ def compute_embeddings(graphs: Dict[str, Dict[str, object]], model_name: str = "
     if not entries:
         return []
     vectors = model.encode(labels, convert_to_numpy=True, show_progress_bar=False)
-    pca = PCA(n_components=2, random_state=42)
-    coords = pca.fit_transform(vectors)
+    umap_reducer = umap.UMAP(n_components=2, random_state=42, n_neighbors=15, min_dist=0.1)
+    coords = umap_reducer.fit_transform(vectors)
     for i, entry in enumerate(entries):
         entry["x"] = float(coords[i, 0])
         entry["y"] = float(coords[i, 1])

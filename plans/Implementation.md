@@ -129,12 +129,12 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [x] React `TextPane` with inline highlights, hover tooltips, and diff view (toggleable, inline word diff).
    - [ ] Diff modes: section alignment + inline sentence diff with color coding; sync scroll on selection.
 
-5. [ ] Embeddings map
-   - [x] Generate embeddings (sentence-transformers + PCA) for entities; save `embeddings.json`.
+5. [x] Embeddings map
+   - [x] Generate embeddings (sentence-transformers + UMAP) for entities; save `embeddings.json`.
    - [x] React `EmbeddingMap` (SVG scatter) with source styling, salience filter, cluster overlays, selection linked to text; upgrade to Visx/Plotly later for richer interactions.
 
-6. [ ] Graph viz
-   - [ ] Cytoscape.js network view per source; merged overlay mode.
+6. [x] Graph viz
+   - [x] Cytoscape.js network view per source; merged overlay mode.
    - [ ] Legend, filters, bias signal styling, and mini-metrics.
    - [ ] Persist layout seeds/positions for stability across reloads.
 
@@ -147,11 +147,30 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Add async job handling (Celery or simple background tasks) for `recompute`.
    - [ ] Cache control and progress status endpoint (persistent).
 
-## Next immediate actions
-- Wire diff/sync-scroll using aligned segments and add inline diff view.
-- Add Cytoscape.js network view with source toggles and overlap highlighting.
-- Upgrade embedding map with clustering/legends (UMAP/t-SNE + overlays) and selection linking to text/graphs.
-- Introduce shared filter context for bias signals and sentiment ranges across components.
+## Recent Progress Updates
+- **Completed (Dec 2025)**:
+  - Upgraded visualizations: Added Cytoscape.js network graph view with node sizing/coloring by salience/type, edge thickness, merged overlay mode, and interactive selection linking.
+  - Added Plotly heatmap for bias metrics (entity sentiment comparison across sources).
+  - Enhanced embedding map with UMAP projection for better clustering; fixed graph data integrity issues.
+  - Installed frontend dependencies (Cytoscape, Plotly, UMAP) and resolved import errors.
+
+## Next immediate actions (Prioritized from Requirements Review)
+- **Upgrade Visualizations** (Partially Complete):
+  - [x] Add Cytoscape.js network view for per-source graphs with node sizing/coloring (salience/type), edge thickness, legends, and merged overlay mode for overlaps.
+  - [x] Add cluster heatmaps for bias metrics (using Plotly for sentiment divergence).
+  - [x] Enhance embedding map: Upgrade to UMAP/t-SNE for better clustering, add bias signal overlays/filters, and link selections to graphs.
+  - [ ] Add legends, mini-metrics, and persist layout positions for graphs.
+- **Enhance Bias Detection**:
+  - Update LLM extraction prompt in `run_extraction.py` to detect loaded language flags (e.g., "conspiracy" vs. "hypothesis") and propaganda techniques (omission, framing).
+  - Add bias signals to graph nodes/UI: Include in `analysis.json`, display in tooltips/filters, and highlight flagged spans in text panes.
+  - Implement core concept coverage metric (% missing concepts between articles).
+- **Add Export and Core Utilities**:
+  - Add export functionality: UI buttons to download reports (JSON, PDF, interactive HTML) via backend.
+  - Implement missing concepts discovery (X app): Basic script for semantic matching and LLM drafting (defer full app to Phase 5).
+- **Polish and Accessibility**:
+  - Wire diff/sync-scroll: Align segments for section-level diffs, add sync scrolling on entity selection.
+  - Responsive layout: Ensure mobile stacks, keyboard navigation, and clear legends/tooltips.
+  - Async recompute: Upgrade to background jobs (e.g., via Celery or threading) with persistent progress status.
 
 ## Minimal Tech Stack
 

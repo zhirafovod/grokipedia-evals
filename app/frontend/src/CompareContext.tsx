@@ -13,6 +13,8 @@ type CompareContextValue = {
   setShowHighlights: (v: boolean) => void;
   showDiff: boolean;
   setShowDiff: (v: boolean) => void;
+  showMergedGraph: boolean;
+  setShowMergedGraph: (v: boolean) => void;
   isRecomputing: boolean;
   setIsRecomputing: (v: boolean) => void;
 };
@@ -25,6 +27,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
   const [salienceThreshold, setSalienceThreshold] = useState(0);
   const [showHighlights, setShowHighlights] = useState(true);
   const [showDiff, setShowDiff] = useState(false);
+  const [showMergedGraph, setShowMergedGraph] = useState(false);
   const [isRecomputing, setIsRecomputing] = useState(false);
 
   return (
@@ -40,6 +43,8 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         setShowHighlights,
         showDiff,
         setShowDiff,
+        showMergedGraph,
+        setShowMergedGraph,
         isRecomputing,
         setIsRecomputing,
       }}
