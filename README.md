@@ -117,6 +117,8 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 
 ## Quickstart: Fetch one article pair
 
+- Create a virtual environment: `python -m venv .venv`
+- Activate it: `source .venv/bin/activate` (Windows: `.\.venv\Scripts\activate`)
 - Install Python deps: `python -m pip install -r requirements.txt`
 - Download Grokipedia + Wikipedia texts into `data/raw/<topic>/`: `python scripts/download_pair.py --grok-url https://grokipedia.com/page/COVID-19_lab_leak_theory --wiki https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory`
 - Outputs land in `data/raw/<topic>/`: `grokipedia.txt` (or `.md` with `--keep-markdown`), `wikipedia.txt`, `metadata.json`.
