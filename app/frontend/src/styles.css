@@ -419,30 +419,46 @@ button:disabled {
   overflow-y: auto;
 }
 
-.diff-line {
-  display: flex;
-  gap: 8px;
-  padding: 4px 8px;
-  white-space: pre-wrap;
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
+
+.diff-row {
+  display: contents;
+}
+
+.diff-cell {
+  padding: 6px 8px;
   border-bottom: 1px solid var(--panel-border);
+  white-space: pre-wrap;
 }
 
-.diff-line:last-child {
-  border-bottom: none;
+.diff-row:nth-child(even) .diff-cell {
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.diff-line.added {
-  background: rgba(110, 231, 183, 0.08);
+.diff-add .diff-cell:nth-child(2),
+.diff-change .diff-cell:nth-child(2) {
+  background: rgba(110, 231, 183, 0.06);
 }
 
-.diff-line.removed {
-  background: rgba(248, 113, 113, 0.08);
+.diff-remove .diff-cell:nth-child(1),
+.diff-change .diff-cell:nth-child(1) {
+  background: rgba(248, 113, 113, 0.06);
 }
 
-.diff-marker {
-  width: 14px;
-  display: inline-block;
-  color: var(--muted);
+.word-added {
+  background: rgba(110, 231, 183, 0.3);
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
+.word-removed {
+  background: rgba(248, 113, 113, 0.3);
+  border-radius: 4px;
+  padding: 0 2px;
 }
 
 .tooltip-inline {

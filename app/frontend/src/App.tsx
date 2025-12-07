@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { diffLines } from "diff";
+import { diffLines, diffWords } from "diff";
 import {
   fetchAnalysis,
   fetchComparison,
@@ -11,6 +11,7 @@ import {
   fetchTopics,
   searchTopic,
   triggerRecompute,
+  fetchRecomputeStatus,
 } from "./api";
 import { CompareProvider, useCompareControls } from "./CompareContext";
 import { EmbeddingMap, EmbeddingPoint } from "./EmbeddingMap";
@@ -185,16 +186,72 @@ function HighlightedSegment({
 }
 
 function DiffView({ left, right }: { left: string; right: string }) {
-  const diff = useMemo(() => diffLines(left || "", right || ""), [left, right]);
+  const blocks = useMemo(() => {
+    const parts = diffLines(left || "", right || "");
+    const merged: { type: "same" | "add" | "remove" | "change"; left?: string; right?: string }[] = [];
+    let i = 0;
+    while (i < parts.length) {
+      const part = parts[i];
+      if (part.added) {
+        merged.push({ type: "add", right: part.value });
+        i += 1;
+      } else if (part.removed) {
+        // if next part is added, treat as change
+        const next = parts[i + 1];
+        if (next && next.added) {
+          merged.push({ type: "change", left: part.value, right: next.value });
+          i += 2;
+        } else {
+          merged.push({ type: "remove", left: part.value });
+          i += 1;
+        }
+      } else {
+        merged.push({ type: "same", left: part.value, right: part.value });
+        i += 1;
+      }
+    }
+    return merged;
+  }, [left, right]);
+
+  const renderWords = (text: string, side: "left" | "right") => {
+    if (!text) return null;
+    const words = diffWords(side === "left" ? text : "", side === "right" ? text : text);
+    return words.map((w, idx) => {
+      if (w.added && side === "right") {
+        return (
+          <span key={idx} className="word-added">
+            {w.value}
+          </span>
+        );
+      }
+      if (w.removed && side === "left") {
+        return (
+          <span key={idx} className="word-removed">
+            {w.value}
+          </span>
+        );
+      }
+      if (!w.added && !w.removed) {
+        return <span key={idx}>{w.value}</span>;
+      }
+      return null;
+    });
+  };
+
   return (
-    <div className="diff-view">
-      {diff.map((part, idx) => (
-        <div
-          key={idx}
-          className={`diff-line ${part.added ? "added" : ""} ${part.removed ? "removed" : ""}`}
-        >
-          <span className="diff-marker">{part.added ? "+" : part.removed ? "-" : " "}</span>
-          <span>{part.value}</span>
+    <div className="diff-grid">
+      {blocks.map((block, idx) => (
+        <div key={idx} className={`diff-row diff-${block.type}`}>
+          <div className="diff-cell">
+            {block.type === "same" && block.left}
+            {block.type === "remove" && <span className="word-removed">{block.left}</span>}
+            {block.type === "change" && renderWords(block.left || "", "left")}
+          </div>
+          <div className="diff-cell">
+            {block.type === "same" && block.right}
+            {block.type === "add" && <span className="word-added">{block.right}</span>}
+            {block.type === "change" && renderWords(block.right || "", "right")}
+          </div>
         </div>
       ))}
     </div>
@@ -326,6 +383,8 @@ function CompareApp() {
     setShowHighlights,
     showDiff,
     setShowDiff,
+    isRecomputing,
+    setIsRecomputing,
   } = useCompareControls();
   const [hoverInfo, setHoverInfo] = useState<{ label: string; source?: string; detail?: string } | null>(null);
 
@@ -368,6 +427,7 @@ function CompareApp() {
   const recompute = useMutation({
     mutationFn: () => triggerRecompute(topic!),
     onSuccess: () => {
+      setIsRecomputing(false);
       // Refresh derived artifacts after recompute finishes
       queryClient.invalidateQueries({ queryKey: ["analysis", topic] });
       queryClient.invalidateQueries({ queryKey: ["comparison", topic] });
@@ -375,7 +435,17 @@ function CompareApp() {
       queryClient.invalidateQueries({ queryKey: ["embeddings", topic] });
       queryClient.invalidateQueries({ queryKey: ["segments", topic] });
       queryClient.invalidateQueries({ queryKey: ["search", topic] });
+      queryClient.invalidateQueries({ queryKey: ["recompute-status", topic] });
     },
+    onError: () => setIsRecomputing(false),
+    onMutate: () => setIsRecomputing(true),
+  });
+
+  const { data: recomputeStatus } = useQuery({
+    queryKey: ["recompute-status", topic],
+    queryFn: () => fetchRecomputeStatus(topic!),
+    enabled: !!topic,
+    refetchInterval: 4000,
   });
 
   const metaLine = useMemo(() => {
@@ -426,12 +496,12 @@ function CompareApp() {
             </div>
           )}
           <button
-            disabled={!topic || recompute.isPending}
+            disabled={!topic || recompute.isPending || isRecomputing}
             onClick={() => recompute.mutate()}
             className="ghost"
             title="Regenerate graphs, comparison, embeddings"
           >
-            {recompute.isPending ? "Recomputing…" : "Recompute"}
+            {recompute.isPending || isRecomputing ? "Recomputing…" : "Recompute"}
           </button>
         </div>
       </header>
@@ -507,6 +577,19 @@ function CompareApp() {
                 <StatusRow label="Comparison" loading={!comparison && !comparisonError && !!topic} error={comparisonError} ok={!!comparison} />
                 <StatusRow label="Embeddings" loading={!embeddings && !embeddingsError && !!topic} error={embeddingsError} ok={!!embeddings} />
                 <StatusRow label="Segments" loading={!segments && !segmentsError && !!topic} error={segmentsError} ok={!!segments} />
+                <StatusRow
+                  label="Recompute"
+                  loading={isRecomputing || recompute.isPending}
+                  error={recomputeStatus?.status === "error"}
+                  ok={recomputeStatus?.status === "ok" || recomputeStatus?.status === "idle"}
+                />
+                {recomputeStatus?.status && (
+                  <div className="muted">
+                    status: {recomputeStatus.status}
+                    {recomputeStatus.detail ? ` (${recomputeStatus.detail})` : ""}
+                    {recomputeStatus.segments ? ` • segments: ${recomputeStatus.segments}` : ""}
+                  </div>
+                )}
               </div>
             </Card>
 

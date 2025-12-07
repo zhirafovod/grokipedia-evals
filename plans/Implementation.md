@@ -126,12 +126,12 @@ A single responsive page providing side-by-side comparison with deep interactivi
 4. [ ] Text highlighting & diff
    - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).
    - [ ] Upgrade segments to aligned blocks with signals for diff modes.
-   - [x] React `TextPane` with inline highlights, hover tooltips, and basic diff view (toggleable).
+   - [x] React `TextPane` with inline highlights, hover tooltips, and diff view (toggleable, inline word diff).
    - [ ] Diff modes: section alignment + inline sentence diff with color coding; sync scroll on selection.
 
 5. [ ] Embeddings map
    - [x] Generate embeddings (sentence-transformers + PCA) for entities; save `embeddings.json`.
-   - [x] React `EmbeddingMap` (SVG scatter) with source styling, salience filter, selection linked to text; upgrade to Visx/Plotly later for richer interactions.
+   - [x] React `EmbeddingMap` (SVG scatter) with source styling, salience filter, cluster overlays, selection linked to text; upgrade to Visx/Plotly later for richer interactions.
 
 6. [ ] Graph viz
    - [ ] Cytoscape.js network view per source; merged overlay mode.

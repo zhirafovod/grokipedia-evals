@@ -14,6 +14,7 @@ import sys
 import re
 from pathlib import Path
 from typing import Any, Dict, List
+import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +33,9 @@ try:
     from generate_segments import generate_segments as generate_segments_artifact  # type: ignore
 except Exception:  # pragma: no cover
     generate_segments_artifact = None
+
+# naive in-memory status tracker; sufficient for local use
+RECOMPUTE_STATUS: Dict[str, Dict[str, Any]] = {}
 
 app = FastAPI(title="Grokipedia Viz API", version="0.1.0")
 app.add_middleware(
@@ -218,11 +222,14 @@ def search_topic(
 def recompute(topic: str) -> Dict[str, str]:
     if generate is None:
         raise HTTPException(status_code=500, detail="Graph generator unavailable")
+    RECOMPUTE_STATUS[topic] = {"status": "running", "started_at": time.time()}
     try:
         generate(topic)
     except FileNotFoundError:
+        RECOMPUTE_STATUS[topic] = {"status": "error", "detail": "analysis.json not found"}
         raise HTTPException(status_code=404, detail="analysis.json not found for topic")
     except Exception as exc:  # pragma: no cover
+        RECOMPUTE_STATUS[topic] = {"status": "error", "detail": str(exc)}
         raise HTTPException(status_code=500, detail=str(exc))
 
     segments_status = "skipped"
@@ -233,4 +240,10 @@ def recompute(topic: str) -> Dict[str, str]:
         except Exception as exc:  # pragma: no cover
             segments_status = f"failed: {exc}"
 
+    RECOMPUTE_STATUS[topic] = {"status": "ok", "finished_at": time.time(), "segments": segments_status}
     return {"status": "ok", "segments": segments_status}
+
+
+@app.get("/api/topic/{topic}/recompute/status")
+def recompute_status(topic: str) -> Dict[str, Any]:
+    return RECOMPUTE_STATUS.get(topic, {"status": "idle"})

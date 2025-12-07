@@ -22,6 +22,14 @@ const TYPE_STROKE: Record<string, string> = {
   concept: "#22d3ee",
 };
 
+type Cluster = {
+  id: string;
+  cx: number;
+  cy: number;
+  radius: number;
+  count: number;
+};
+
 function scalePoints(points: EmbeddingPoint[], width: number, height: number, padding = 24) {
   if (!points.length) return [];
   const xs = points.map((p) => p.x);
@@ -64,6 +72,60 @@ export function EmbeddingMap({
   }, [points, salienceThreshold, showGrok, showWiki]);
 
   const scaled = useMemo(() => scalePoints(filtered, 620, 360), [filtered]);
+  const clusters = useMemo(() => {
+    const k = Math.max(2, Math.min(8, Math.round(Math.sqrt(Math.max(1, scaled.length) / 4))));
+    if (scaled.length === 0) return [];
+    const seeds = scaled.slice(0, k);
+    let centroids = seeds.map((p, idx) => ({ id: `c${idx}`, x: p.sx, y: p.sy }));
+    for (let iter = 0; iter < 6; iter++) {
+      const assignments: { sx: number; sy: number; cluster: number }[] = [];
+      scaled.forEach((p) => {
+        let best = 0;
+        let bestd = Number.POSITIVE_INFINITY;
+        centroids.forEach((c, ci) => {
+          const d = (p.sx - c.x) ** 2 + (p.sy - c.y) ** 2;
+          if (d < bestd) {
+            bestd = d;
+            best = ci;
+          }
+        });
+        assignments.push({ sx: p.sx, sy: p.sy, cluster: best });
+      });
+      const next: { sumx: number; sumy: number; count: number }[] = Array.from({ length: k }, () => ({
+        sumx: 0,
+        sumy: 0,
+        count: 0,
+      }));
+      assignments.forEach((a) => {
+        next[a.cluster].sumx += a.sx;
+        next[a.cluster].sumy += a.sy;
+        next[a.cluster].count += 1;
+      });
+      centroids = centroids.map((c, idx) => {
+        const info = next[idx];
+        if (info.count === 0) return c;
+        return { ...c, x: info.sumx / info.count, y: info.sumy / info.count };
+      });
+    }
+    const clusters: Cluster[] = centroids.map((c, idx) => {
+      const pts = scaled.filter((p) => {
+        let best = 0;
+        let bestd = Number.POSITIVE_INFINITY;
+        centroids.forEach((cent, ci) => {
+          const d = (p.sx - cent.x) ** 2 + (p.sy - cent.y) ** 2;
+          if (d < bestd) {
+            bestd = d;
+            best = ci;
+          }
+        });
+        return best === idx;
+      });
+      if (pts.length === 0) return { id: `c${idx}`, cx: c.x, cy: c.y, radius: 0, count: 0 };
+      const maxDist = Math.max(...pts.map((p) => Math.sqrt((p.sx - c.x) ** 2 + (p.sy - c.y) ** 2)));
+      return { id: `c${idx}`, cx: c.x, cy: c.y, radius: maxDist + 16, count: pts.length };
+    });
+    return clusters;
+  }, [scaled]);
   const selectedLower = selectedName?.toLowerCase();
 
   return (
@@ -83,6 +145,24 @@ export function EmbeddingMap({
         </div>
       </div>
       <svg className="embedding-map" viewBox="0 0 620 360" role="img" aria-label="Embedding scatterplot">
+        {clusters.map((c, idx) =>
+          c.count > 0 ? (
+            <g key={c.id}>
+              <circle
+                cx={c.cx}
+                cy={c.cy}
+                r={c.radius}
+                fill="none"
+                stroke="rgba(96,165,250,0.25)"
+                strokeWidth={1.5}
+                strokeDasharray="4 4"
+              />
+              <text x={c.cx} y={c.cy} textAnchor="middle" fill="#9ca3af" fontSize="11">
+                {c.count}
+              </text>
+            </g>
+          ) : null
+        )}
         {scaled.map((p) => {
           const isSelected = selectedLower && p.label.toLowerCase() === selectedLower;
           const fill = SOURCE_COLORS[p.source] || "#94a3b8";

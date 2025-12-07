@@ -51,3 +51,8 @@ export async function triggerRecompute(topic: string) {
   const resp = await client.post(`/api/topic/${topic}/recompute`);
   return resp.data;
 }
+
+export async function fetchRecomputeStatus(topic: string) {
+  const resp = await client.get(`/api/topic/${topic}/recompute/status`);
+  return resp.data;
+}
