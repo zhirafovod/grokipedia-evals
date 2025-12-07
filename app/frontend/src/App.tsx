@@ -171,7 +171,7 @@ function App() {
     queryFn: () => fetchEmbeddings(topic!),
     enabled: !!topic,
   });
-  const { isError: segmentsMissing } = useQuery({
+  const { data: segments, isError: segmentsMissing } = useQuery({
     queryKey: ["segments", topic],
     queryFn: () => fetchSegments(topic!),
     enabled: !!topic,
@@ -195,6 +195,13 @@ function App() {
     if (!model && !generated) return "";
     return [model, generated].filter(Boolean).join(" • ");
   }, [analysis, raw]);
+
+  const segmentCounts = {
+    grok: segments?.segments?.grokipedia?.length ?? 0,
+    wiki: segments?.segments?.wikipedia?.length ?? 0,
+  };
+  const segmentsMeta = segments?.meta;
+  const segmentsFallback = segmentsMeta?.generated === "fallback";
 
   return (
     <div className="app">
@@ -225,7 +232,12 @@ function App() {
           <div className="main-column">
             <Card
               title="Article text"
-              actions={<div className="pill-row">{segmentsMissing && <span className="pill warning">segments.json missing</span>}</div>}
+              actions={
+                <div className="pill-row">
+                  {segmentsMissing && <span className="pill warning">segments.json missing</span>}
+                  {segmentsFallback && <span className="pill warning">segments=fallback</span>}
+                </div>
+              }
             >
               <div className="split">
                 <TextPane title="Grokipedia" text={raw?.grokipedia} loading={loadingRaw} />
@@ -279,6 +291,28 @@ function App() {
                   </div>
                 </div>
               </div>
+            </Card>
+
+            <Card title="Segments">
+              <div className="overlap">
+                <div>
+                  <div className="metric-label">Grok segments</div>
+                  <div className="metric-sub">
+                    {segmentCounts.grok ?? (segmentsMissing ? "missing" : "—")}
+                  </div>
+                </div>
+                <div>
+                  <div className="metric-label">Wiki segments</div>
+                  <div className="metric-sub">
+                    {segmentCounts.wiki ?? (segmentsMissing ? "missing" : "—")}
+                  </div>
+                </div>
+              </div>
+              {segmentsMeta && (
+                <div className="muted" style={{ marginTop: 6 }}>
+                  generated: {segmentsMeta.generated || "unknown"} {segmentsFallback ? "(fallback paragraphs)" : ""}
+                </div>
+              )}
             </Card>
           </div>
         </div>

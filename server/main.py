@@ -28,6 +28,10 @@ try:
     from generate_graphs import generate  # type: ignore
 except Exception:  # pragma: no cover
     generate = None
+try:
+    from generate_segments import generate_segments as generate_segments_artifact  # type: ignore
+except Exception:  # pragma: no cover
+    generate_segments_artifact = None
 
 app = FastAPI(title="Grokipedia Viz API", version="0.1.0")
 app.add_middleware(
@@ -216,8 +220,17 @@ def recompute(topic: str) -> Dict[str, str]:
         raise HTTPException(status_code=500, detail="Graph generator unavailable")
     try:
         generate(topic)
-        return {"status": "ok"}
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="analysis.json not found for topic")
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=500, detail=str(exc))
+
+    segments_status = "skipped"
+    if generate_segments_artifact is not None:
+        try:
+            generate_segments_artifact(topic)
+            segments_status = "generated"
+        except Exception as exc:  # pragma: no cover
+            segments_status = f"failed: {exc}"
+
+    return {"status": "ok", "segments": segments_status}

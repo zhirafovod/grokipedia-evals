@@ -8,12 +8,14 @@ This document reviews the current implementation, identifies missing gaps for a 
 - `scripts/` provide data acquisition (`download_pair.py`, `grokipedia-crawler.py`) and extraction (`run_extraction.py`) producing `data/artifacts/<topic>/analysis.json`.
 - Graph generation + embeddings: `scripts/generate_graphs.py` builds per-source graphs, comparison, and `embeddings.json` (SentenceTransformer + PCA).
 - Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, segments (fallback paragraphs), search, and recompute.
-- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
+- Segmentation: `scripts/generate_segments.py` emits `segments.json` (paragraph-level with entity spans); server serves it and falls back to paragraphs if missing.
+- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action, segment counts); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
 - `plans/Graph.md` defines graph schema, metrics, and comparison outputs.
 
 **Gaps**
 - Server still lacks filter endpoints, schema validation, recompute job status, and cache controls (segments are basic fallback only).
 - Graph/embedding generation is basic (no bias signal attributes, no layout hints, PCA-only projection, no size/quality validation).
+- Segments lack alignment/diff metadata and bias/sentiment densities; fallback remains paragraph-only.
 - UI lacks interactive highlighting/diff, Cytoscape graph view, embedding map, and filters/legends/sync scroll; design system is minimal.
 - No deterministic layout positions or visualization configs precomputed for client use.
 - No asset endpoints for future static exports (PNG/SVG) or prebuilt layout snapshots.
@@ -119,7 +121,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Compose `CompareView` with selection/filter context, loading/error states, and component wiring for highlights/graphs.
 
 4. [ ] Text highlighting & diff
-   - [ ] Generate `segments.json` with aligned blocks, entity spans, signals, offsets.
+   - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).
+   - [ ] Upgrade segments to aligned blocks with signals for diff modes.
    - [ ] React `TextPane` with inline highlights, hover tooltips, and synchronized scroll.
    - [ ] Diff modes: section alignment + inline sentence diff with color coding.
 
