@@ -54,6 +54,15 @@ body {
   align-items: flex-end;
 }
 
+.search input {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  padding: 9px 10px;
+  border-radius: 10px;
+  min-width: 220px;
+}
+
 .select {
   display: flex;
   flex-direction: column;

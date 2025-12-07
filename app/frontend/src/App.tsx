@@ -8,6 +8,7 @@ import {
   fetchRaw,
   fetchSegments,
   fetchTopics,
+  searchTopic,
   triggerRecompute,
 } from "./api";
 
@@ -219,6 +220,7 @@ function App() {
   const queryClient = useQueryClient();
   const { data: topics = [], isLoading: loadingTopics } = useQuery({ queryKey: ["topics"], queryFn: fetchTopics });
   const { topic, setTopic } = useTopicSelection(topics);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: raw, isLoading: loadingRaw } = useQuery({
     queryKey: ["raw", topic],
@@ -250,6 +252,11 @@ function App() {
     queryFn: () => fetchSegments(topic!),
     enabled: !!topic,
   });
+  const { data: searchResults, isFetching: searching } = useQuery({
+    queryKey: ["search", topic, searchQuery],
+    queryFn: () => searchTopic(topic!, searchQuery, "entity"),
+    enabled: !!topic && searchQuery.trim().length > 1,
+  });
 
   const recompute = useMutation({
     mutationFn: () => triggerRecompute(topic!),
@@ -260,6 +267,7 @@ function App() {
       queryClient.invalidateQueries({ queryKey: ["graphs", topic] });
       queryClient.invalidateQueries({ queryKey: ["embeddings", topic] });
       queryClient.invalidateQueries({ queryKey: ["segments", topic] });
+      queryClient.invalidateQueries({ queryKey: ["search", topic] });
     },
   });
 
@@ -287,6 +295,14 @@ function App() {
         </div>
         <div className="header-actions">
           <SelectTopic topics={topics} selected={topic} onChange={setTopic} />
+          <div className="search">
+            <input
+              type="search"
+              placeholder="Search entities…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <button
             disabled={!topic || recompute.isPending}
             onClick={() => recompute.mutate()}
@@ -395,6 +411,30 @@ function App() {
               {segmentsMeta && (
                 <div className="muted" style={{ marginTop: 6 }}>
                   generated: {segmentsMeta.generated || "unknown"} {segmentsFallback ? "(fallback paragraphs)" : ""}
+                </div>
+              )}
+            </Card>
+
+            <Card title="Search results">
+              {!searchQuery && <div className="muted">Type 2+ chars to search entities.</div>}
+              {searchQuery && searching && <div className="muted">Searching…</div>}
+              {searchQuery && !searching && (
+                <div className="embeddings">
+                  {searchResults?.results?.length ? (
+                    <ul>
+                      {searchResults.results.map((r: any) => (
+                        <li key={`${r.source}-${r.id}`}>
+                          <span className="pill">{r.source}</span>
+                          <strong>{r.label}</strong>
+                          <span className="muted">
+                            ({r.type || "entity"}) · sentiment {r.sentiment ?? "n/a"} · salience {r.salience ?? "n/a"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="muted">No matches.</div>
+                  )}
                 </div>
               )}
             </Card>
