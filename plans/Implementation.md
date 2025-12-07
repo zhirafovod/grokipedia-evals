@@ -111,13 +111,14 @@ A single responsive page providing side-by-side comparison with deep interactivi
 
 4. [ ] Text highlighting & diff
    - [x] Implement hover/click tooltips with metrics (Streamlit prototype).
-   - [ ] Segment articles; align by entity overlap for diff mode; inline diff.
+   - [x] Segment articles; align by entity overlap for diff mode; inline diff (sentence-level prototype).
 
 5. [ ] Embeddings map
    - [x] Generate embeddings (sentence-transformers) for entities; save `embeddings.json`.
-   - [ ] Implement interactive scatter map with filters and tooltips in main UI.
+   - [x] Implement interactive scatter map with filters and tooltips (Streamlit prototype).
 
 6. [ ] Graph viz
+   - [x] Prototype graph view (PyVis in Streamlit) per source.
    - [ ] Cytoscape.js network view per source; merged overlay mode.
    - [ ] Legend, filters, and style mapping for bias signals.
 
@@ -128,6 +129,12 @@ A single responsive page providing side-by-side comparison with deep interactivi
 8. [ ] Optional recompute pipeline
    - [ ] Add async job handling (Celery or simple background tasks) for `recompute`.
    - [ ] Cache control and progress status endpoint.
+
+## Next immediate actions
+- Scaffold React/Vite frontend in `app/` that consumes FastAPI endpoints for topics, analysis, graphs, comparison, embeddings.
+- Add Cytoscape.js network view component with source toggles and overlap highlighting.
+- Add embedding scatter component (reuse data from embeddings.json) with filters.
+- Wire text/diff highlighting in the React UI using precomputed artifacts.
 
 ## Minimal Tech Stack
 

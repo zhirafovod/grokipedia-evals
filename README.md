@@ -149,6 +149,12 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
   - `GET /api/topic/{topic}/embeddings`
   - `POST /api/topic/{topic}/recompute` (runs graph generation)
 
+## React/Vite frontend (WIP)
+
+- Location: `app/frontend`
+- Install deps: `cd app/frontend && npm install`
+- Run dev server: `npm run dev` (set `VITE_BACKEND_URL` env to point at FastAPI, default http://127.0.0.1:8000)
+
 ## Extraction & scoring (xAI SDK)
 
 - Ensure `.env` has `XAI_API_KEY` (already provided) and your venv is active.

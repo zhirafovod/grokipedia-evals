@@ -596,6 +596,41 @@ def render_embeddings_map(embeddings: Optional[Dict[str, Any]]) -> None:
     st.altair_chart(chart, use_container_width=True)
 
 
+def render_pyvis_graph(graph: Dict[str, Any], title: str) -> None:
+    try:
+        from pyvis.network import Network
+    except ImportError:
+        st.warning("pyvis not installed")
+        return
+    net = Network(height="400px", width="100%", directed=True, notebook=False)
+    net.barnes_hut()
+    for node in graph.get("nodes", []):
+        color = "#2563eb" if graph.get("meta", {}).get("source") == "grokipedia" else "#d97706"
+        net.add_node(
+            node.get("id"),
+            label=node.get("label"),
+            color=color,
+            title=str(node.get("attrs", {})),
+        )
+    for edge in graph.get("edges", []):
+        net.add_edge(edge.get("src"), edge.get("dst"), title=edge.get("label"), label=edge.get("label"))
+    html_str = net.generate_html(notebook=False)
+    st.markdown(f"**{title}**")
+    components.html(html_str, height=420, scrolling=True)
+
+
+def render_graph_views(graphs: Optional[Dict[str, Any]]) -> None:
+    st.subheader("Graph views")
+    if not graphs:
+        st.info("No graphs to render.")
+        return
+    cols = st.columns(2)
+    with cols[0]:
+        render_pyvis_graph(graphs.get("grokipedia", {}), "Grokipedia graph")
+    with cols[1]:
+        render_pyvis_graph(graphs.get("wikipedia", {}), "Wikipedia graph")
+
+
 def render_relation_graphs(analysis: Dict[str, Any]) -> None:
     st.subheader("Relations (graph view)")
     cols = st.columns(3)
@@ -666,6 +701,7 @@ def main() -> None:
         render_llm_metrics(analysis)
         render_comparison_panel(comparison)
         render_graph_stats(graphs)
+        render_graph_views(graphs)
         render_embeddings_map(embeddings)
         render_sentence_diff(grok_text, wiki_text)
     else:
