@@ -7,14 +7,14 @@ This document reviews the current implementation, identifies missing gaps for a 
 **Current state**
 - `scripts/` provide data acquisition (`download_pair.py`, `grokipedia-crawler.py`) and extraction (`run_extraction.py`) producing `data/artifacts/<topic>/analysis.json`.
 - Graph generation + embeddings: `scripts/generate_graphs.py` builds per-source graphs, comparison, and `embeddings.json` (SentenceTransformer + PCA).
-- Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, and recompute.
-- Frontend: `app/frontend` (React + Vite + React Query) hits the FastAPI endpoints with a minimal topic selector and data dump view; `app/local_viewer.py` (Streamlit) remains as a prototype playground.
+- Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, segments (fallback paragraphs), search, and recompute.
+- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
 - `plans/Graph.md` defines graph schema, metrics, and comparison outputs.
 
 **Gaps**
-- Server lacks segments/search/filter endpoints, schema validation, recompute job status, and cache controls.
+- Server still lacks filter endpoints, schema validation, recompute job status, and cache controls (segments are basic fallback only).
 - Graph/embedding generation is basic (no bias signal attributes, no layout hints, PCA-only projection, no size/quality validation).
-- UI is skeletal: no design system, no interactive highlighting/diff, no Cytoscape graph view, no embedding map, no filters/legends/sync scroll.
+- UI lacks interactive highlighting/diff, Cytoscape graph view, embedding map, and filters/legends/sync scroll; design system is minimal.
 - No deterministic layout positions or visualization configs precomputed for client use.
 - No asset endpoints for future static exports (PNG/SVG) or prebuilt layout snapshots.
 
@@ -104,8 +104,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
 
 1. [x] Server scaffolding (FastAPI)
    - [x] Create `server/` with `main.py`.
-   - [x] Implement endpoints: topics/raw/analysis/graphs/comparison/embeddings + recompute.
-   - [ ] Add segments/search/filter endpoints; optional jobs status; schema validation + error handling hardening.
+   - [x] Implement endpoints: topics/raw/analysis/graphs/comparison/embeddings/segments/search + recompute (segments = fallback paragraphs).
+   - [ ] Add filter endpoints; optional jobs status; schema validation + error handling hardening; upgrade segments to aligned spans.
 
 2. [x] Graph generation
    - [x] Implement `scripts/generate_graphs.py` per `plans/Graph.md`.
@@ -113,10 +113,10 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Add bias signal attrs, layout hints, and artifact validation; allow cached embedding reuse/offline mode.
 
 3. [ ] UI foundation (React + Vite)
-   - [x] Scaffold React/Vite + React Query fetching topics/raw/analysis/graphs/comparison/embeddings.
-   - [ ] Build layout shell (header with topic selector/search/recompute, dual panes, metrics/sidebar, footer map).
-   - [ ] Establish design tokens + palettes; reusable primitives (Card, Pill, Legend, Tooltip, Slider).
-   - [ ] Compose `CompareView` with data hooks, loading/error states, and context for selections/filters.
+   - [x] Scaffold React/Vite + React Query fetching topics/raw/analysis/graphs/comparison/embeddings/segments (fallback).
+   - [x] Build layout shell (header with topic selector + recompute, dual panes, metrics/sidebar, embeddings preview).
+   - [x] Establish basic design tokens + palettes; reusable primitives (Card, Pill).
+   - [ ] Compose `CompareView` with selection/filter context, loading/error states, and component wiring for highlights/graphs.
 
 4. [ ] Text highlighting & diff
    - [ ] Generate `segments.json` with aligned blocks, entity spans, signals, offsets.

@@ -36,3 +36,18 @@ export async function fetchRaw(topic: string) {
   const resp = await client.get(`/api/topic/${topic}/raw`);
   return resp.data;
 }
+
+export async function fetchSegments(topic: string) {
+  const resp = await client.get(`/api/topic/${topic}/segments`);
+  return resp.data;
+}
+
+export async function searchTopic(topic: string, query: string, kind: "entity" | "relation" | "claim" = "entity") {
+  const resp = await client.get(`/api/topic/${topic}/search`, { params: { query, kind } });
+  return resp.data;
+}
+
+export async function triggerRecompute(topic: string) {
+  const resp = await client.post(`/api/topic/${topic}/recompute`);
+  return resp.data;
+}
