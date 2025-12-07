@@ -69,4 +69,74 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 
 ## Architecture
 
-TBD
+### High-Level Flow
+
+- Ingest two target articles (Grokipedia + Wikipedia).
+- Extract entities, relations, claims, and sentiment using LLM + NLP.
+- Build per-article knowledge graphs and compute comparison metrics.
+- Generate embeddings and cluster views for concepts and bias signals.
+- Visualize side-by-side pages with interactive graphs and comparison panels.
+
+### Core Components
+
+- `Data Ingestion`: HTTP fetch of article content + optional cached dumps (HF datasets).
+- `Extraction & Scoring`: LLM pipelines for entity/relations, claim framing, propaganda techniques, sentiment.
+- `Graph Builder`: Build per-article graph structures (nodes/edges, attributes).
+- `Analytics`: Embedding generation, clustering, overlap/ divergence metrics, bias scoring.
+- `Web App`: Two pages (Grokipedia/Wikipedia) with synchronized views and comparison module.
+
+### MVP
+
+- `Static Site (no backend)`: Precompute JSON artifacts; host as static assets. Pros: simple deploy, cheap. Cons: no on-demand analysis.
+- `All-in-Python Notebook`: Use Streamlit for quick UI. Pros: fastest to iterate. Cons: limited UI/graph flexibility.
+- `Full-stack Next.js`: Server-side rendering + API routes; good DX. Cons: mixing Python pipelines requires extra infra.
+
+### Further improvements
+
+- `Frontend`: React + Vite, Tailwind CSS, D3.js (graphs) or Cytoscape.js (networks), Plotly (heatmaps), TanStack Router.
+- `Backend`: Python FastAPI for pipelines; uvicorn for dev; Celery (optional) for async jobs.
+- `LLM & NLP`: OpenAI/Anthropic/GitHub Models via Azure AI Foundry or direct; spaCy for NLP; sentence-transformers for embeddings.
+- `Data`: SQLite for small cache; Parquet for intermediate artifacts; HuggingFace datasets for dumps.
+- `Graph`: NetworkX (processing) + Cytoscape.js (rendering).
+- `Eval`: LLM-as-a-Judge prompts with structured scorecards; store JSON outputs.
+
+### Project Structure
+
+- `app/` React front-end (Vite), renders two pages and comparison.
+- `server/` FastAPI with endpoints for extraction, graphs, metrics.
+- `data/` cached inputs and computed artifacts (JSON, Parquet).
+
+## Data & Pipelines
+
+- `Fetchers`: HTTP scrape APIs or dataset loaders (HF `grokipedia-v0.1-dump`, `wikipedia-monthly`).
+- `Extractors`: LLM prompts for entities/relations, claim framing, sentiment; spaCy NER fallback.
+- `Embeddings`: `sentence-transformers` for concept embeddings; UMAP/t-SNE for projection.
+- `Graphs`: NetworkX to build nodes/edges with attributes: type (concept/bias/core), score (sentiment, propaganda likelihood), source (wiki/grok).
+- `Metrics`: Overlap (entity Jaccard), sentiment divergence, loaded-language frequency, omission heuristics.
+- `Outputs`: JSON (graphs, metrics), CSV/Parquet (tables), optional Atlas map config.
+
+## Two-Page MVP
+
+- `Page: Grokipedia`
+  - Article view with extracted core concepts, graph panel (Cytoscape.js), bias signals list, download JSON.
+  - Controls: prompt profile selector (strict/lenient), recompute button (if backend).
+
+- `Page: Wikipedia`
+  - Same layout for parity; visual cues for loaded language, framing, omission flags.
+
+- `Comparison Sidebar`
+  - Entity overlap, sentiment divergence, propaganda techniques tally, top-5 differences.
+
+## Implementation Notes
+
+- Use xAI Python SDK
+- Favor deterministic prompt templates; log model name, temperature, and version.
+- Keep artifacts small (<5MB) for fast load; paginate or lazy-load graph components.
+- Use IDs stable across runs for entities to support comparison.
+- Add minimal tests: pipeline unit tests for extractor prompts and metric calculations.
+
+## Next Steps
+
+- Scaffold `server` (FastAPI + requirements.txt) and `app` (Vite React).
+- Implement precompute CLI for the two selected articles.
+- Wire frontend to load `data/artifacts/*.json` and render graphs and metrics.
