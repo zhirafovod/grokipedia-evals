@@ -71,6 +71,7 @@ export function EmbeddingMap({
 }) {
   const [showGrok, setShowGrok] = useState(true);
   const [showWiki, setShowWiki] = useState(true);
+  const [showLabels, setShowLabels] = useState(false);
   const [hovered, setHovered] = useState<{ label: string; detail?: string } | null>(null);
 
   const filtered = useMemo(() => {
@@ -185,6 +186,11 @@ export function EmbeddingMap({
           </label>
           <span className="dot" style={{ background: SOURCE_COLORS.wikipedia }} />
         </div>
+        <div className="legend-row">
+          <label>
+            <input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} /> Show labels
+          </label>
+        </div>
       </div>
       <svg className="embedding-map" viewBox="0 0 620 360" role="img" aria-label="Embedding scatterplot">
         {clusters.map((c, idx) =>
@@ -199,8 +205,11 @@ export function EmbeddingMap({
                 strokeWidth={1.5}
                 strokeDasharray="4 4"
               />
-              <text x={c.cx} y={c.cy} textAnchor="middle" fill="#9ca3af" fontSize="11">
-                {c.count}
+              <text x={c.cx} y={c.cy - 5} textAnchor="middle" fill="#9ca3af" fontSize="11">
+                Cluster {idx + 1}
+              </text>
+              <text x={c.cx} y={c.cy + 10} textAnchor="middle" fill="#9ca3af" fontSize="9">
+                ({c.count} nodes)
               </text>
             </g>
           ) : null
@@ -246,6 +255,17 @@ export function EmbeddingMap({
                   {p.sentiment !== undefined ? ` • sentiment ${p.sentiment}` : ""}
                 </title>
               </circle>
+              {showLabels && (
+                <text
+                  x={size + 2}
+                  y={3}
+                  fontSize="8"
+                  fill="#333"
+                  pointerEvents="none"
+                >
+                  {p.label}
+                </text>
+              )}
               {isSelected && <circle r={size + 4} fill="none" stroke="#6ee7b7" strokeWidth={2} opacity={0.9} />}
             </g>
           );
