@@ -6,15 +6,17 @@ This document reviews the current implementation, identifies missing gaps for a 
 
 **Current state**
 - `scripts/` provide data acquisition (`download_pair.py`, `grokipedia-crawler.py`) and extraction (`run_extraction.py`) producing `data/artifacts/<topic>/analysis.json`.
-- `app/local_viewer.py` (Streamlit) shows side-by-side content and basic artifacts.
+- Graph generation + embeddings: `scripts/generate_graphs.py` builds per-source graphs, comparison, and `embeddings.json` (SentenceTransformer + PCA).
+- Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, and recompute.
+- Frontend: `app/frontend` (React + Vite + React Query) hits the FastAPI endpoints with a minimal topic selector and data dump view; `app/local_viewer.py` (Streamlit) remains as a prototype playground.
 - `plans/Graph.md` defines graph schema, metrics, and comparison outputs.
 
 **Gaps**
-- No local server (FastAPI) to serve artifacts, recompute analysis, or provide comparison APIs.
-- No standardized graph outputs: `<source>_graph.json`, `comparison.json` generation pipeline not yet implemented.
-- UI is basic; lacks interactive highlighting, entity-linked text views, diff visualization, and clustered embeddings.
-- No deterministic layout positions or visualization configs precomputed.
-- No asset endpoints for charts/graphs; Streamlit limits advanced interactions.
+- Server lacks segments/search/filter endpoints, schema validation, recompute job status, and cache controls.
+- Graph/embedding generation is basic (no bias signal attributes, no layout hints, PCA-only projection, no size/quality validation).
+- UI is skeletal: no design system, no interactive highlighting/diff, no Cytoscape graph view, no embedding map, no filters/legends/sync scroll.
+- No deterministic layout positions or visualization configs precomputed for client use.
+- No asset endpoints for future static exports (PNG/SVG) or prebuilt layout snapshots.
 
 ## Local Server Design
 
@@ -29,13 +31,16 @@ This document reviews the current implementation, identifies missing gaps for a 
 - `GET /api/topic/{topic}/analysis` → load `analysis.json`.
 - `GET /api/topic/{topic}/graphs` → `{ grok_graph, wiki_graph }` (`<source>_graph.json`).
 - `GET /api/topic/{topic}/comparison` → `comparison.json`.
+- `GET /api/topic/{topic}/segments` → aligned segments with highlights (future `segments.json`).
+- `GET /api/topic/{topic}/search` → entity/claim search + filters (optionally backed by SQLite).
 - `POST /api/topic/{topic}/recompute` → trigger pipeline: build graphs + comparison from `analysis.json`.
+- Optional: `GET /api/jobs/{id}` → recompute status; `POST /api/topic/{topic}/recompute/async` for background jobs.
 - Optional: `GET /api/topic/{topic}/embeddings` → clustered coordinates for concepts/entities.
 
 **Pipeline integration**
-- Implement `scripts/generate_graphs.py`: reads `analysis.json`, writes `<source>_graph.json` and `comparison.json`.
-- Deterministic canonicalization and layout seed.
-- Log model metadata for reproducibility.
+- `scripts/generate_graphs.py`: reads `analysis.json`, writes `<source>_graph.json`, `comparison.json`, `embeddings.json` (already present; needs schema validation + bias/layout fields).
+- Add `scripts/generate_segments.py` (or extend generator) to emit `segments.json` with aligned blocks + highlights used by the UI.
+- Deterministic canonicalization and layout seed; log model metadata for reproducibility; enforce artifact size/quality checks.
 
 ## Fancy UI Requirements
 
@@ -92,6 +97,7 @@ A single responsive page providing side-by-side comparison with deep interactivi
 
 - Inputs: `analysis.json` with entities, relations, claims, sentiment, salience, bias signals.
 - Graphs: as in `plans/Graph.md` → `<source>_graph.json` and `comparison.json`.
+- Segments: `segments.json` for aligned blocks + per-span highlights (entities, signals, sentiment).
 - Embeddings: optional `embeddings.json` containing `[ { id, x, y, label, source, type, sentiment, salience, bias_signals } ]`.
 
 ## Iterative Steps
@@ -99,28 +105,32 @@ A single responsive page providing side-by-side comparison with deep interactivi
 1. [x] Server scaffolding (FastAPI)
    - [x] Create `server/` with `main.py`.
    - [x] Implement endpoints: topics/raw/analysis/graphs/comparison/embeddings + recompute.
+   - [ ] Add segments/search/filter endpoints; optional jobs status; schema validation + error handling hardening.
 
 2. [x] Graph generation
    - [x] Implement `scripts/generate_graphs.py` per `plans/Graph.md`.
    - [x] Write `<source>_graph.json`, `comparison.json`, `embeddings.json` for existing topic.
+   - [ ] Add bias signal attrs, layout hints, and artifact validation; allow cached embedding reuse/offline mode.
 
-3. [ ] UI foundation
-   - [ ] Replace Streamlit with React + Vite app in `app/`.
-   - [ ] Pages: `CompareView` and components: `TextPane`, `EntityList`, `MetricsPanel`, `NetworkView`, `EmbeddingMap`.
-   - [ ] Fetch from local server endpoints.
+3. [ ] UI foundation (React + Vite)
+   - [x] Scaffold React/Vite + React Query fetching topics/raw/analysis/graphs/comparison/embeddings.
+   - [ ] Build layout shell (header with topic selector/search/recompute, dual panes, metrics/sidebar, footer map).
+   - [ ] Establish design tokens + palettes; reusable primitives (Card, Pill, Legend, Tooltip, Slider).
+   - [ ] Compose `CompareView` with data hooks, loading/error states, and context for selections/filters.
 
 4. [ ] Text highlighting & diff
-   - [x] Implement hover/click tooltips with metrics (Streamlit prototype).
-   - [x] Segment articles; align by entity overlap for diff mode; inline diff (sentence-level prototype).
+   - [ ] Generate `segments.json` with aligned blocks, entity spans, signals, offsets.
+   - [ ] React `TextPane` with inline highlights, hover tooltips, and synchronized scroll.
+   - [ ] Diff modes: section alignment + inline sentence diff with color coding.
 
 5. [ ] Embeddings map
-   - [x] Generate embeddings (sentence-transformers) for entities; save `embeddings.json`.
-   - [x] Implement interactive scatter map with filters and tooltips (Streamlit prototype).
+   - [x] Generate embeddings (sentence-transformers + PCA) for entities; save `embeddings.json`.
+   - [ ] React `EmbeddingMap` (Visx/Plotly) with source/type styling, filters, selection linking to text.
 
 6. [ ] Graph viz
-   - [x] Prototype graph view (PyVis in Streamlit) per source.
    - [ ] Cytoscape.js network view per source; merged overlay mode.
-   - [ ] Legend, filters, and style mapping for bias signals.
+   - [ ] Legend, filters, bias signal styling, and mini-metrics.
+   - [ ] Persist layout seeds/positions for stability across reloads.
 
 7. [ ] Polishing & accessibility
    - [ ] Responsive layout and aesthetic polish.
@@ -131,10 +141,10 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Cache control and progress status endpoint.
 
 ## Next immediate actions
-- Scaffold React/Vite frontend in `app/` that consumes FastAPI endpoints for topics, analysis, graphs, comparison, embeddings.
-- Add Cytoscape.js network view component with source toggles and overlap highlighting.
-- Add embedding scatter component (reuse data from embeddings.json) with filters.
-- Wire text/diff highlighting in the React UI using precomputed artifacts.
+- Flesh out React layout shell with header/sidebar + CompareView panes, wired to existing hooks.
+- Add `segments.json` generator + API endpoint; use it to drive highlights and diff modes in the React TextPane.
+- Add Cytoscape.js network view with source toggles and overlap highlighting.
+- Add embedding scatter component (Visx/Plotly) with filters linked to text highlights.
 
 ## Minimal Tech Stack
 
