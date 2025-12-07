@@ -129,6 +129,7 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - Ensure the virtual environment is active (`source .venv/bin/activate`) and deps are installed.
 - Run the viewer: `streamlit run app/local_viewer.py`
 - Pick a topic from the sidebar (it reads `data/raw/<topic>/`) to see Grokipedia vs Wikipedia content side by side and inspect `metadata.json`.
+- If `data/artifacts/<topic>/analysis.json` exists (run the extractor), the UI will show entities, entity overlap, and relation graphs for both sources.
 
 ## Extraction & scoring (xAI SDK)
 

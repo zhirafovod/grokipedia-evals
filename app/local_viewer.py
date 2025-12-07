@@ -10,13 +10,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Any
 
 import streamlit as st
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_ROOT = BASE_DIR / "data" / "raw"
+ARTIFACT_ROOT = BASE_DIR / "data" / "artifacts"
 
 
 def list_topics(data_root: Path) -> Tuple[str, ...]:
@@ -55,6 +56,16 @@ def load_article_content(topic_dir: Path) -> Tuple[str, str, Dict[str, object]]:
     return grok_text, wiki_text, metadata
 
 
+def load_analysis(topic: str) -> Optional[Dict[str, Any]]:
+    path = ARTIFACT_ROOT / topic / "analysis.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 def render_sidebar(topics: Tuple[str, ...]) -> Optional[str]:
     st.sidebar.header("Dataset")
     st.sidebar.write("Browsing article pairs from `data/raw/`.")
@@ -73,6 +84,64 @@ def render_metadata(metadata: Dict[str, object]) -> None:
     st.json(metadata, expanded=False)
 
 
+def render_entities(analysis: Dict[str, Any]) -> None:
+    st.subheader("Entities (from extraction)")
+    cols = st.columns(2)
+    for idx, (label, color) in enumerate((("Grokipedia", "#eef6ff"), ("Wikipedia", "#fff6ee"))):
+        with cols[idx]:
+            entities = analysis.get("articles", {}).get(label.lower(), {}).get("entities", [])
+            if entities:
+                st.write(f"{label} ({len(entities)})")
+                st.dataframe(entities, hide_index=True, use_container_width=True)
+            else:
+                st.warning(f"No entities found for {label.lower()}.")
+
+    overlap = analysis.get("metrics", {}).get("entity_overlap")
+    if overlap:
+        st.markdown(
+            f"**Entity overlap (Jaccard):** {overlap.get('jaccard', 0):.3f} "
+            f"| intersection: {len(overlap.get('intersection', []))} "
+            f"| grok: {overlap.get('grok_count', 0)} | wiki: {overlap.get('wiki_count', 0)}"
+        )
+        if overlap.get("intersection"):
+            st.caption("Common entities")
+            st.code(", ".join(overlap["intersection"]))
+
+
+def build_relation_graph(relations: list[dict], title: str, color: str = "#2b6cb0") -> str:
+    """Build a Graphviz DOT string for relations."""
+    lines = [f'digraph "{title}" {{', "rankdir=LR;", 'node [shape=box, style="rounded,filled"];']
+    for rel in relations[:20]:
+        subj = rel.get("subject", "Unknown").replace('"', "'")
+        obj = rel.get("object", "Unknown").replace('"', "'")
+        pred = rel.get("predicate", "").replace('"', "'")
+        lines.append(f'"{subj}" -> "{obj}" [label="{pred}", color="{color}"];')
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def render_relation_graphs(analysis: Dict[str, Any]) -> None:
+    st.subheader("Relations (graph view)")
+    cols = st.columns(2)
+    grok_rel = analysis.get("articles", {}).get("grokipedia", {}).get("relations", [])
+    wiki_rel = analysis.get("articles", {}).get("wikipedia", {}).get("relations", [])
+
+    with cols[0]:
+        if grok_rel:
+            st.markdown("**Grokipedia relations**")
+            dot = build_relation_graph(grok_rel, "Grokipedia", color="#2563eb")
+            st.graphviz_chart(dot, use_container_width=True)
+        else:
+            st.info("No Grokipedia relations available.")
+    with cols[1]:
+        if wiki_rel:
+            st.markdown("**Wikipedia relations**")
+            dot = build_relation_graph(wiki_rel, "Wikipedia", color="#d97706")
+            st.graphviz_chart(dot, use_container_width=True)
+        else:
+            st.info("No Wikipedia relations available.")
+
+
 def main() -> None:
     st.set_page_config(page_title="Grokipedia vs Wikipedia Viewer", layout="wide")
     st.title("Grokipedia vs Wikipedia Viewer")
@@ -84,6 +153,7 @@ def main() -> None:
         st.stop()
 
     topic_dir = DATA_ROOT / topic
+    analysis = load_analysis(topic)
     grok_text, wiki_text, metadata = load_article_content(topic_dir)
 
     st.subheader(f"Topic: {topic}")
@@ -100,6 +170,12 @@ def main() -> None:
             st.text_area("wikipedia content", wiki_text, height=600, label_visibility="collapsed")
         else:
             st.warning("Missing wikipedia.txt")
+
+    if analysis:
+        render_entities(analysis)
+        render_relation_graphs(analysis)
+    else:
+        st.info("No analysis artifact found in data/artifacts/<topic>/analysis.json. Run scripts/run_extraction.py first.")
 
     render_metadata(metadata)
 
