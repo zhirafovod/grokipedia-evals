@@ -130,6 +130,14 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - Run the viewer: `streamlit run app/local_viewer.py`
 - Pick a topic from the sidebar (it reads `data/raw/<topic>/`) to see Grokipedia vs Wikipedia content side by side and inspect `metadata.json`.
 
+## Extraction & scoring (xAI SDK)
+
+- Ensure `.env` has `XAI_API_KEY` (already provided) and your venv is active.
+- Install deps if needed: `python -m pip install -r requirements.txt`
+- Run extraction for a topic:  
+  `python scripts/run_extraction.py --topic COVID-19_lab_leak_theory --model grok-3`
+- Outputs land in `data/artifacts/<topic>/analysis.json` with entities, relations, claims, sentiment, and simple overlap metrics.
+
 ## Two-Page MVP
 
 - `Page: Grokipedia`
@@ -158,6 +166,7 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 
 ## Changelog
 
+- 2025-12-07: Added xAI-powered extraction pipeline (`scripts/run_extraction.py`) and documented how to run it; dependencies updated.
 - 2024-12-21: Added local Streamlit viewer (`app/local_viewer.py`) and documented how to run it.
 - 2024-12-21: Added `requirements.txt` and updated README quickstart/install instructions.
 - 2024-12-20: Added `scripts/download_pair.py` to fetch Grokipedia + Wikipedia pairs and documented the quickstart command/output structure.

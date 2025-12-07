@@ -1,3 +1,4 @@
 .env
 .venv
 dumpster
+__pycache__

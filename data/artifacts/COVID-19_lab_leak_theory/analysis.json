@@ -1,0 +1,584 @@
+{
+  "topic": "COVID-19_lab_leak_theory",
+  "model": "grok-3",
+  "generated_at": "2025-12-07T14:16:36.630451+00:00",
+  "inputs": {
+    "grokipedia_path": "/Users/sesergee/projects/sandbox/hack/xai-2025/grokipedia-viz/data/raw/COVID-19_lab_leak_theory/grokipedia.txt",
+    "wikipedia_path": "/Users/sesergee/projects/sandbox/hack/xai-2025/grokipedia-viz/data/raw/COVID-19_lab_leak_theory/wikipedia.txt",
+    "max_chars": 12000
+  },
+  "articles": {
+    "grokipedia": {
+      "entities": [
+        {
+          "name": "COVID-19 lab leak theory",
+          "type": "Theory",
+          "salience": 0.9,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "SARS-CoV-2",
+          "type": "Virus",
+          "salience": 0.85,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Wuhan Institute of Virology (WIV)",
+          "type": "Institution",
+          "salience": 0.8,
+          "sentiment": "negative"
+        },
+        {
+          "name": "Wuhan, China",
+          "type": "Location",
+          "salience": 0.75,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Bat coronaviruses",
+          "type": "Virus Group",
+          "salience": 0.7,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Gain-of-function experiments",
+          "type": "Research Type",
+          "salience": 0.65,
+          "sentiment": "negative"
+        },
+        {
+          "name": "FBI",
+          "type": "Organization",
+          "salience": 0.6,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Department of Energy",
+          "type": "Organization",
+          "salience": 0.55,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "CIA",
+          "type": "Organization",
+          "salience": 0.5,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Germany's foreign intelligence",
+          "type": "Organization",
+          "salience": 0.45,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "U.S. House subcommittee",
+          "type": "Government Body",
+          "salience": 0.4,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Shi Zhengli",
+          "type": "Person",
+          "salience": 0.35,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "EcoHealth Alliance",
+          "type": "Organization",
+          "salience": 0.3,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "NIAID",
+          "type": "Organization",
+          "salience": 0.25,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Huanan Seafood Wholesale Market",
+          "type": "Location",
+          "salience": 0.2,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Furin cleavage site",
+          "type": "Genetic Feature",
+          "salience": 0.2,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Yunnan Province",
+          "type": "Location",
+          "salience": 0.15,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "RaTG13",
+          "type": "Virus Strain",
+          "salience": 0.1,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "BSL-4 laboratory",
+          "type": "Facility",
+          "salience": 0.1,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "H1N1 influenza A virus",
+          "type": "Virus",
+          "salience": 0.05,
+          "sentiment": "negative"
+        }
+      ],
+      "relations": [
+        {
+          "subject": "COVID-19 lab leak theory",
+          "predicate": "hypothesizes",
+          "object": "SARS-CoV-2 originated from Wuhan Institute of Virology",
+          "evidence": "hypothesizes that SARS-CoV-2... originated from an accidental release at the Wuhan Institute of Virology"
+        },
+        {
+          "subject": "Wuhan Institute of Virology",
+          "predicate": "conducts research on",
+          "object": "bat coronaviruses",
+          "evidence": "a facility in China conducting research on bat coronaviruses"
+        },
+        {
+          "subject": "WIV",
+          "predicate": "reported",
+          "object": "biosafety concerns",
+          "evidence": "reported biosafety concerns including inadequate training and equipment failures"
+        },
+        {
+          "subject": "FBI",
+          "predicate": "concludes",
+          "object": "lab origin with moderate confidence",
+          "evidence": "FBI concluding a lab origin with moderate confidence"
+        },
+        {
+          "subject": "Department of Energy",
+          "predicate": "assesses",
+          "object": "lab origin with low confidence",
+          "evidence": "Department of Energy with low confidence"
+        },
+        {
+          "subject": "CIA",
+          "predicate": "shifts to",
+          "object": "lab leak more likely in 2025",
+          "evidence": "CIA shifting in 2025 to deem a lab leak more likely"
+        },
+        {
+          "subject": "Germany's foreign intelligence",
+          "predicate": "estimates",
+          "object": "80-90% probability of lab accident",
+          "evidence": "Germany's foreign intelligence service estimated an 80-90% probability of a lab accident"
+        },
+        {
+          "subject": "WIV researchers",
+          "predicate": "experienced",
+          "object": "illnesses in late 2019",
+          "evidence": "reports of illnesses among WIV researchers in late 2019"
+        },
+        {
+          "subject": "SARS-CoV-2",
+          "predicate": "has",
+          "object": "furin cleavage site",
+          "evidence": "the virus's distinctive furin cleavage site"
+        },
+        {
+          "subject": "U.S. House subcommittee",
+          "predicate": "affirms",
+          "object": "lab leak as most probable origin",
+          "evidence": "U.S. House subcommittee investigation in 2024 affirmed the lab leak as the most probable origin"
+        },
+        {
+          "subject": "WIV",
+          "predicate": "took offline",
+          "object": "public database in 2019",
+          "evidence": "on September 12, 2019, WIV took its public database of over 22,000 viral samples offline"
+        },
+        {
+          "subject": "EcoHealth Alliance",
+          "predicate": "proposed",
+          "object": "DEFUSE project with WIV",
+          "evidence": "In 2018, EcoHealth Alliance proposed the DEFUSE project to DARPA, which involved WIV collaboration"
+        },
+        {
+          "subject": "H1N1 influenza A virus",
+          "predicate": "reemerged due to",
+          "object": "lab release in 1977",
+          "evidence": "reemergence of the H1N1 influenza A virus in 1977... attributed to an accidental release"
+        },
+        {
+          "subject": "SARS-CoV",
+          "predicate": "escaped",
+          "object": "containment in 2003-2004",
+          "evidence": "Coronaviruses have also escaped containment... at least four laboratory-acquired infections"
+        },
+        {
+          "subject": "WIV",
+          "predicate": "located near",
+          "object": "Huanan Seafood Wholesale Market",
+          "evidence": "WIV's geographic proximity to the outbreak's early epicenter at the Huanan Seafood Market"
+        }
+      ],
+      "claims": [
+        {
+          "summary": "SARS-CoV-2 likely originated from a lab leak at WIV",
+          "stance": "pro",
+          "evidence_snippet": "U.S. House subcommittee investigation in 2024 affirmed the lab leak as the most probable origin"
+        },
+        {
+          "summary": "FBI supports lab leak origin with moderate confidence",
+          "stance": "pro",
+          "evidence_snippet": "FBI concluding a lab origin with moderate confidence"
+        },
+        {
+          "summary": "Department of Energy has low confidence in lab leak",
+          "stance": "neutral",
+          "evidence_snippet": "Department of Energy with low confidence"
+        },
+        {
+          "summary": "CIA deems lab leak more likely in 2025",
+          "stance": "pro",
+          "evidence_snippet": "CIA shifting in 2025 to deem a lab leak more likely"
+        },
+        {
+          "summary": "Germany's intelligence estimates high probability of lab accident",
+          "stance": "pro",
+          "evidence_snippet": "estimated an 80-90% probability of a lab accident"
+        },
+        {
+          "summary": "No intermediate host for SARS-CoV-2 identified",
+          "stance": "neutral",
+          "evidence_snippet": "No intermediate animal host has been conclusively identified"
+        },
+        {
+          "summary": "WIV researchers ill in late 2019 with COVID-19-like symptoms",
+          "stance": "pro",
+          "evidence_snippet": "illnesses among WIV researchers in late 2019 consistent with COVID-19 symptoms"
+        },
+        {
+          "summary": "Furin cleavage site suggests possible engineering",
+          "stance": "pro",
+          "evidence_snippet": "furin cleavage site... may suggest engineering"
+        },
+        {
+          "summary": "WIV had biosafety issues before outbreak",
+          "stance": "pro",
+          "evidence_snippet": "reported biosafety concerns including inadequate training and equipment failures"
+        },
+        {
+          "summary": "Historical lab leaks show precedent for accidental release",
+          "stance": "pro",
+          "evidence_snippet": "Laboratory leaks of pathogenic viruses have occurred multiple times"
+        },
+        {
+          "summary": "Zoonotic spillover at Huanan market lacks definitive host evidence",
+          "stance": "neutral",
+          "evidence_snippet": "No intermediate host carrying SARS-CoV-2 has been definitively identified"
+        },
+        {
+          "summary": "Early dismissal of lab leak theory may be influenced by institutional ties",
+          "stance": "pro",
+          "evidence_snippet": "early efforts to dismiss the theory as conspiratorial, potentially influenced by institutional ties"
+        }
+      ],
+      "sentiment": {
+        "overall": "neutral",
+        "score": -1,
+        "notes": "Article presents a balanced view of the lab leak theory with supporting and circumstantial evidence, but also acknowledges zoonotic hypotheses and lack of conclusive data; slight negative tone due to focus on biosafety failures and geopolitical tensions."
+      }
+    },
+    "wikipedia": {
+      "entities": [
+        {
+          "name": "COVID-19 lab leak theory",
+          "type": "Hypothesis",
+          "salience": 0.9,
+          "sentiment": "negative"
+        },
+        {
+          "name": "SARS-CoV-2",
+          "type": "Virus",
+          "salience": 0.85,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "COVID-19 pandemic",
+          "type": "Event",
+          "salience": 0.8,
+          "sentiment": "negative"
+        },
+        {
+          "name": "Wuhan Institute of Virology (WIV)",
+          "type": "Institution",
+          "salience": 0.75,
+          "sentiment": "negative"
+        },
+        {
+          "name": "Huanan Seafood Market",
+          "type": "Location",
+          "salience": 0.7,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Wuhan, China",
+          "type": "Location",
+          "salience": 0.65,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Bats",
+          "type": "Animal",
+          "salience": 0.6,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Zoonotic transmission",
+          "type": "Concept",
+          "salience": 0.55,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "World Health Organization (WHO)",
+          "type": "Organization",
+          "salience": 0.5,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "China",
+          "type": "Country",
+          "salience": 0.45,
+          "sentiment": "negative"
+        },
+        {
+          "name": "United States",
+          "type": "Country",
+          "salience": 0.4,
+          "sentiment": "negative"
+        },
+        {
+          "name": "RaTG13",
+          "type": "Virus strain",
+          "salience": 0.35,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "BANAL-52",
+          "type": "Virus strain",
+          "salience": 0.3,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Richard Ebright",
+          "type": "Person",
+          "salience": 0.25,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Ralph Baric",
+          "type": "Person",
+          "salience": 0.2,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Danielle Anderson",
+          "type": "Person",
+          "salience": 0.15,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Stephan Lewandowsky",
+          "type": "Person",
+          "salience": 0.1,
+          "sentiment": "neutral"
+        },
+        {
+          "name": "Marc Lipsitch",
+          "type": "Person",
+          "salience": 0.05,
+          "sentiment": "neutral"
+        }
+      ],
+      "relations": [
+        {
+          "subject": "COVID-19 lab leak theory",
+          "predicate": "proposes",
+          "object": "SARS-CoV-2 originated from a laboratory",
+          "evidence": "hypothesis that SARS-CoV-2... originated from a laboratory"
+        },
+        {
+          "subject": "SARS-CoV-2",
+          "predicate": "likely originated via",
+          "object": "zoonotic transmission",
+          "evidence": "most scientists believe it spread... through natural zoonotic transmission"
+        },
+        {
+          "subject": "Huanan Seafood Market",
+          "predicate": "is linked to",
+          "object": "initial COVID-19 cases",
+          "evidence": "first known human infections... in Wuhan... at the Huanan Seafood Market"
+        },
+        {
+          "subject": "Wuhan Institute of Virology",
+          "predicate": "is near",
+          "object": "Huanan Seafood Market",
+          "evidence": "located within miles of... Huanan Seafood Wholesale Market"
+        },
+        {
+          "subject": "COVID-19 lab leak theory",
+          "predicate": "is dismissed by",
+          "object": "most scientists",
+          "evidence": "widely dismissed it as a conspiracy theory"
+        },
+        {
+          "subject": "WHO",
+          "predicate": "deems",
+          "object": "lab leak extremely unlikely",
+          "evidence": "WHO... deemed the possibility 'extremely unlikely'"
+        },
+        {
+          "subject": "China",
+          "predicate": "rejects",
+          "object": "laboratory audits",
+          "evidence": "subsequent plans for laboratory audits were rejected by China"
+        },
+        {
+          "subject": "Bats",
+          "predicate": "are considered",
+          "object": "natural reservoir of SARS-CoV-2",
+          "evidence": "bats... considered the most likely natural reservoir"
+        },
+        {
+          "subject": "SARS-CoV-2",
+          "predicate": "shows similarity to",
+          "object": "RaTG13",
+          "evidence": "RaTG13... has a 96% resemblance to SARS-CoV-2"
+        },
+        {
+          "subject": "Lab leak theory",
+          "predicate": "gained popularity in",
+          "object": "United States",
+          "evidence": "gained popularity in the United States through promotion by conservative personalities"
+        },
+        {
+          "subject": "WIV",
+          "predicate": "conducted research on",
+          "object": "SARS-like bat coronaviruses",
+          "evidence": "conducting research on SARS-like bat coronaviruses since 2005"
+        },
+        {
+          "subject": "Lab leak theory",
+          "predicate": "is associated with",
+          "object": "anti-Chinese sentiment",
+          "evidence": "leveraged and increased anti-Chinese sentiment"
+        },
+        {
+          "subject": "Richard Ebright",
+          "predicate": "characterizes",
+          "object": "WIV experiments as gain-of-function",
+          "evidence": "some experts (such as Richard Ebright) have characterized as gain-of-function"
+        },
+        {
+          "subject": "Ralph Baric",
+          "predicate": "disputes",
+          "object": "gain-of-function characterization",
+          "evidence": "others (including Ralph Baric) have disputed the characterization"
+        },
+        {
+          "subject": "Danielle Anderson",
+          "predicate": "describes",
+          "object": "WIV as having strict safety protocols",
+          "evidence": "said the lab 'worked in the same way as any other high-containment lab'"
+        }
+      ],
+      "claims": [
+        {
+          "summary": "SARS-CoV-2 likely originated from zoonotic transmission",
+          "stance": "pro",
+          "evidence_snippet": "most scientists believe it spread... through natural zoonotic transmission"
+        },
+        {
+          "summary": "No evidence supports a lab leak origin for SARS-CoV-2",
+          "stance": "con",
+          "evidence_snippet": "there is no evidence supporting laboratory involvement"
+        },
+        {
+          "summary": "Lab leak theory is considered a conspiracy theory",
+          "stance": "con",
+          "evidence_snippet": "widely dismissed it as a conspiracy theory"
+        },
+        {
+          "summary": "WHO report finds lab leak extremely unlikely",
+          "stance": "con",
+          "evidence_snippet": "deemed the possibility 'extremely unlikely'"
+        },
+        {
+          "summary": "Huanan Seafood Market is the likely origin point",
+          "stance": "pro",
+          "evidence_snippet": "first known human infections... at the Huanan Seafood Market"
+        },
+        {
+          "summary": "Bats are the most likely natural reservoir of SARS-CoV-2",
+          "stance": "pro",
+          "evidence_snippet": "bats... considered the most likely natural reservoir"
+        },
+        {
+          "summary": "Lab leak theory fueled by proximity of WIV to outbreak",
+          "stance": "con",
+          "evidence_snippet": "misplaced suspicion based on the proximity... to the Wuhan Institute of Virology"
+        },
+        {
+          "summary": "Politicization of lab leak theory increases tensions",
+          "stance": "con",
+          "evidence_snippet": "weaponization by politicians... fomenting tensions between the U.S. and China"
+        },
+        {
+          "summary": "Some scientists support examining lab leak possibility",
+          "stance": "neutral",
+          "evidence_snippet": "some scientists agree a lab leak should be examined"
+        },
+        {
+          "summary": "Lab leak theory linked to anti-Chinese sentiment",
+          "stance": "con",
+          "evidence_snippet": "leveraged and increased anti-Chinese sentiment"
+        },
+        {
+          "summary": "Previous lab leaks have occurred but not with novel viruses",
+          "stance": "neutral",
+          "evidence_snippet": "no epidemic has ever been caused by the leak of a novel virus"
+        },
+        {
+          "summary": "Public belief in lab leak tied to identity politics",
+          "stance": "con",
+          "evidence_snippet": "identity politics and racial resentment are factors informing... belief in the lab leak theory"
+        }
+      ],
+      "sentiment": {
+        "overall": "negative",
+        "score": -1,
+        "notes": "Article predominantly critiques the lab leak theory as unsupported and conspiratorial, with strong emphasis on zoonotic origin evidence."
+      }
+    }
+  },
+  "metrics": {
+    "entity_overlap": {
+      "jaccard": 0.1515,
+      "intersection": [
+        "covid-19 lab leak theory",
+        "ratg13",
+        "sars-cov-2",
+        "wuhan institute of virology (wiv)",
+        "wuhan, china"
+      ],
+      "grok_count": 20,
+      "wiki_count": 18
+    },
+    "claims_count": {
+      "grokipedia": 12,
+      "wikipedia": 12
+    }
+  }
+}
