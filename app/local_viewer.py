@@ -120,11 +120,46 @@ def build_relation_graph(relations: list[dict], title: str, color: str = "#2b6cb
     return "\n".join(lines)
 
 
+def build_unified_graph(grok_rel: list[dict], wiki_rel: list[dict], common_entities: set[str]) -> str:
+    """Graphviz DOT showing both sources; common entities are highlighted."""
+    lines = [
+        'digraph "Unified" {',
+        "rankdir=LR;",
+        'node [shape=box, style="rounded,filled"];',
+    ]
+
+    def node_attrs(name: str, source_color: str) -> str:
+        base = f'fillcolor="{source_color}"'
+        if name.lower().strip() in common_entities:
+            base = 'fillcolor="#c7f9cc", color="#15803d", penwidth=2'
+        return base
+
+    for rel in grok_rel[:15]:
+        subj = rel.get("subject", "Unknown").replace('"', "'")
+        obj = rel.get("object", "Unknown").replace('"', "'")
+        pred = rel.get("predicate", "").replace('"', "'")
+        lines.append(f'"{subj}" [{node_attrs(subj, "#e0edff")}];')
+        lines.append(f'"{obj}" [{node_attrs(obj, "#e0edff")}];')
+        lines.append(f'"{subj}" -> "{obj}" [label="{pred}", color="#2563eb"];')
+
+    for rel in wiki_rel[:15]:
+        subj = rel.get("subject", "Unknown").replace('"', "'")
+        obj = rel.get("object", "Unknown").replace('"', "'")
+        pred = rel.get("predicate", "").replace('"', "'")
+        lines.append(f'"{subj}" [{node_attrs(subj, "#fff1e6")}];')
+        lines.append(f'"{obj}" [{node_attrs(obj, "#fff1e6")}];')
+        lines.append(f'"{subj}" -> "{obj}" [label="{pred}", color="#d97706", style="dashed"];')
+
+    lines.append("}")
+    return "\n".join(lines)
+
+
 def render_relation_graphs(analysis: Dict[str, Any]) -> None:
     st.subheader("Relations (graph view)")
-    cols = st.columns(2)
+    cols = st.columns(3)
     grok_rel = analysis.get("articles", {}).get("grokipedia", {}).get("relations", [])
     wiki_rel = analysis.get("articles", {}).get("wikipedia", {}).get("relations", [])
+    common = set((analysis.get("metrics", {}).get("entity_overlap", {}) or {}).get("intersection", []))
 
     with cols[0]:
         if grok_rel:
@@ -140,6 +175,13 @@ def render_relation_graphs(analysis: Dict[str, Any]) -> None:
             st.graphviz_chart(dot, use_container_width=True)
         else:
             st.info("No Wikipedia relations available.")
+    with cols[2]:
+        if grok_rel or wiki_rel:
+            st.markdown("**Unified graph** (common entities highlighted)")
+            dot = build_unified_graph(grok_rel, wiki_rel, {c.lower().strip() for c in common})
+            st.graphviz_chart(dot, use_container_width=True)
+        else:
+            st.info("No relations to show unified view.")
 
 
 def main() -> None:
