@@ -11,6 +11,8 @@ type CompareContextValue = {
   setSalienceThreshold: (v: number) => void;
   showHighlights: boolean;
   setShowHighlights: (v: boolean) => void;
+  showDiff: boolean;
+  setShowDiff: (v: boolean) => void;
 };
 
 const CompareContext = createContext<CompareContextValue | undefined>(undefined);
@@ -20,6 +22,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(null);
   const [salienceThreshold, setSalienceThreshold] = useState(0);
   const [showHighlights, setShowHighlights] = useState(true);
+  const [showDiff, setShowDiff] = useState(false);
 
   return (
     <CompareContext.Provider
@@ -32,6 +35,8 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         setSalienceThreshold,
         showHighlights,
         setShowHighlights,
+        showDiff,
+        setShowDiff,
       }}
     >
       {children}

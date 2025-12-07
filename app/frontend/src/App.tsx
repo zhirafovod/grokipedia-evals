@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { diffLines } from "diff";
 import {
   fetchAnalysis,
   fetchComparison,
@@ -112,12 +113,14 @@ function HighlightedSegment({
   selectedName,
   salienceThreshold,
   showHighlights,
+  onHover,
 }: {
   segment: Segment;
   index: number;
   selectedName?: string;
   salienceThreshold: number;
   showHighlights: boolean;
+  onHover?: (info: { label: string; detail?: string; source?: string } | null) => void;
 }) {
   const { text = "", entities = [], start = 0 } = segment;
   const parts = useMemo(() => {
@@ -148,6 +151,13 @@ function HighlightedSegment({
             key={`${segment.id}-${ent.name}-${relStart}`}
             className={`highlight${selectedName && ent.name?.toLowerCase() === selectedName.toLowerCase() ? " highlight-active" : ""}`}
             title={`${ent.name}${ent.type ? ` (${ent.type})` : ""}`}
+            onMouseEnter={() =>
+              onHover?.({
+                label: ent.name || "",
+                detail: `${ent.type || "entity"} • salience ${ent.salience ?? "?"} • sentiment ${ent.sentiment ?? "?"}`,
+              })
+            }
+            onMouseLeave={() => onHover?.(null)}
           >
             {slice}
           </span>
@@ -174,6 +184,23 @@ function HighlightedSegment({
   );
 }
 
+function DiffView({ left, right }: { left: string; right: string }) {
+  const diff = useMemo(() => diffLines(left || "", right || ""), [left, right]);
+  return (
+    <div className="diff-view">
+      {diff.map((part, idx) => (
+        <div
+          key={idx}
+          className={`diff-line ${part.added ? "added" : ""} ${part.removed ? "removed" : ""}`}
+        >
+          <span className="diff-marker">{part.added ? "+" : part.removed ? "-" : " "}</span>
+          <span>{part.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TextPane({
   title,
   text,
@@ -182,6 +209,8 @@ function TextPane({
   selectedName,
   salienceThreshold,
   showHighlights,
+  disabled,
+  onHover,
 }: {
   title: string;
   text?: string;
@@ -190,6 +219,8 @@ function TextPane({
   selectedName?: string;
   salienceThreshold: number;
   showHighlights: boolean;
+  disabled?: boolean;
+  onHover?: (info: { label: string; detail?: string } | null) => void;
 }) {
   const paragraphs = (text || "").split(/\n\n+/).filter(Boolean);
   const hasSegments = segments && segments.length > 0;
@@ -197,7 +228,7 @@ function TextPane({
     <div className="text-pane">
       <div className="pane-title">{title}</div>
       {loading && <div className="muted">Loading…</div>}
-      {!loading && hasSegments && (
+      {!loading && hasSegments && !disabled && (
         <div className="segment-scroll">
           {segments!.map((seg, idx) => (
             <HighlightedSegment
@@ -207,12 +238,13 @@ function TextPane({
               selectedName={selectedName}
               salienceThreshold={salienceThreshold}
               showHighlights={showHighlights}
+              onHover={onHover}
             />
           ))}
         </div>
       )}
-      {!loading && !hasSegments && paragraphs.length === 0 && <div className="muted">No text available.</div>}
-      {!loading && !hasSegments && paragraphs.length > 0 && (
+      {!loading && (!hasSegments || disabled) && paragraphs.length === 0 && <div className="muted">No text available.</div>}
+      {!loading && (!hasSegments || disabled) && paragraphs.length > 0 && (
         <div className="text-scroll">
           {paragraphs.map((p, idx) => (
             <p key={idx}>{p}</p>
@@ -292,7 +324,10 @@ function CompareApp() {
     setSalienceThreshold,
     showHighlights,
     setShowHighlights,
+    showDiff,
+    setShowDiff,
   } = useCompareControls();
+  const [hoverInfo, setHoverInfo] = useState<{ label: string; source?: string; detail?: string } | null>(null);
 
   const { data: raw, isLoading: loadingRaw, error: rawError } = useQuery({
     queryKey: ["raw", topic],
@@ -425,6 +460,8 @@ function CompareApp() {
                   selectedName={selectedEntity?.name}
                   salienceThreshold={salienceThreshold}
                   showHighlights={showHighlights}
+                  disabled={showDiff}
+                  onHover={(info) => setHoverInfo(info)}
                 />
                 <TextPane
                   title="Wikipedia"
@@ -434,8 +471,15 @@ function CompareApp() {
                   selectedName={selectedEntity?.name}
                   salienceThreshold={salienceThreshold}
                   showHighlights={showHighlights}
+                  disabled={showDiff}
+                  onHover={(info) => setHoverInfo(info)}
                 />
               </div>
+              {hoverInfo && (
+                <div className="tooltip-inline">
+                  <strong>{hoverInfo.label}</strong> {hoverInfo.detail}
+                </div>
+              )}
             </Card>
 
             <Card title="Embedding map">
@@ -446,6 +490,12 @@ function CompareApp() {
                 salienceThreshold={salienceThreshold}
               />
             </Card>
+
+            {showDiff && (
+              <Card title="Diff view">
+                <DiffView left={raw?.grokipedia || ""} right={raw?.wikipedia || ""} />
+              </Card>
+            )}
           </div>
 
           <div className="side-column">
@@ -479,6 +529,10 @@ function CompareApp() {
                 <div className="switch-row">
                   <span>Show highlights</span>
                   <input type="checkbox" checked={showHighlights} onChange={(e) => setShowHighlights(e.target.checked)} />
+                </div>
+                <div className="switch-row">
+                  <span>Show diff view</span>
+                  <input type="checkbox" checked={showDiff} onChange={(e) => setShowDiff(e.target.checked)} />
                 </div>
               </div>
             </Card>

@@ -126,8 +126,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
 4. [ ] Text highlighting & diff
    - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).
    - [ ] Upgrade segments to aligned blocks with signals for diff modes.
-   - [ ] React `TextPane` with inline highlights, hover tooltips, and synchronized scroll.
-   - [ ] Diff modes: section alignment + inline sentence diff with color coding.
+   - [x] React `TextPane` with inline highlights, hover tooltips, and basic diff view (toggleable).
+   - [ ] Diff modes: section alignment + inline sentence diff with color coding; sync scroll on selection.
 
 5. [ ] Embeddings map
    - [x] Generate embeddings (sentence-transformers + PCA) for entities; save `embeddings.json`.

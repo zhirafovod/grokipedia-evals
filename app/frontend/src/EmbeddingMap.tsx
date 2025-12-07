@@ -52,6 +52,7 @@ export function EmbeddingMap({
 }) {
   const [showGrok, setShowGrok] = useState(true);
   const [showWiki, setShowWiki] = useState(true);
+  const [hovered, setHovered] = useState<{ label: string; detail?: string } | null>(null);
 
   const filtered = useMemo(() => {
     return points.filter((p) => {
@@ -97,6 +98,13 @@ export function EmbeddingMap({
                 opacity={isSelected ? 1 : 0.8}
                 className="clickable"
                 onClick={() => onSelect(p.label, p.source, p.type)}
+                onMouseEnter={() =>
+                  setHovered({
+                    label: p.label,
+                    detail: `${p.source}${p.type ? ` • ${p.type}` : ""} • salience ${p.salience ?? "?"} • sentiment ${p.sentiment ?? "?"}`,
+                  })
+                }
+                onMouseLeave={() => setHovered(null)}
               >
                 <title>
                   {p.label} • {p.source} {p.type ? `• ${p.type}` : ""}
@@ -110,6 +118,11 @@ export function EmbeddingMap({
         })}
       </svg>
       <div className="muted">{scaled.length} points shown</div>
+      {hovered && (
+        <div className="embedding-tooltip">
+          <strong>{hovered.label}</strong> {hovered.detail}
+        </div>
+      )}
     </div>
   );
 }

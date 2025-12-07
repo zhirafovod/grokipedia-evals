@@ -367,6 +367,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .embedding-map {
@@ -395,6 +396,62 @@ button:disabled {
   height: 12px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.embedding-tooltip {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.diff-view {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.diff-line {
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  white-space: pre-wrap;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.diff-line:last-child {
+  border-bottom: none;
+}
+
+.diff-line.added {
+  background: rgba(110, 231, 183, 0.08);
+}
+
+.diff-line.removed {
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.diff-marker {
+  width: 14px;
+  display: inline-block;
+  color: var(--muted);
+}
+
+.tooltip-inline {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  font-size: 13px;
 }
 
 .pill.warning {
