@@ -130,6 +130,7 @@ A list of open-source projects related for knowledge graphs, clustering, and hea
 - Run the viewer: `streamlit run app/local_viewer.py`
 - Pick a topic from the sidebar (it reads `data/raw/<topic>/`) to see Grokipedia vs Wikipedia content side by side and inspect `metadata.json`.
 - If `data/artifacts/<topic>/analysis.json` exists (run the extractor), the UI will show entities, entity overlap, and relation graphs for both sources.
+- Diff/insights: the UI also shows common/unique entities, linked-text hover highlighting, cosine entity matches, sentiment divergence, unified graph, and LLM-judged bias metrics.
 
 ## Extraction & scoring (xAI SDK)
 

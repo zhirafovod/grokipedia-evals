@@ -43,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out-dir", default=str(DATA_OUT), help="Base output directory for artifacts")
     parser.add_argument("--user", default="local-dev", help="User tag for telemetry")
     parser.add_argument("--embed-model", default="all-MiniLM-L6-v2", help="SentenceTransformer model for entity embeddings")
+    parser.add_argument("--llm-metrics-model", default="grok-3", help="Model for pairwise LLM-judged metrics")
     return parser.parse_args()
 
 
@@ -99,6 +100,8 @@ def compute_entity_overlap(grok_entities: List[Dict[str, object]], wiki_entities
         "intersection": intersection,
         "grok_count": len(grok_names),
         "wiki_count": len(wiki_names),
+        "grok_unique": sorted(grok_names - wiki_names),
+        "wiki_unique": sorted(wiki_names - grok_names),
     }
 
 
@@ -137,6 +140,59 @@ def compute_entity_similarity(
     }
 
 
+def sentiment_to_score(sentiment: str) -> float:
+    s = (sentiment or "").lower()
+    if "positive" in s:
+        return 1.0
+    if "negative" in s:
+        return -1.0
+    return 0.0
+
+
+def compute_sentiment_divergence(grok_entities: List[Dict[str, object]], wiki_entities: List[Dict[str, object]]) -> Dict[str, object]:
+    g_map = {canonical(ent.get("name", "")): ent for ent in grok_entities if ent.get("name")}
+    w_map = {canonical(ent.get("name", "")): ent for ent in wiki_entities if ent.get("name")}
+    common = set(g_map) & set(w_map)
+    if not common:
+        return {"mean_abs_diff": 0.0, "count": 0}
+    diffs = []
+    for key in common:
+        g_score = sentiment_to_score(g_map[key].get("sentiment", ""))
+        w_score = sentiment_to_score(w_map[key].get("sentiment", ""))
+        diffs.append(abs(g_score - w_score))
+    mean_abs = sum(diffs) / len(diffs) if diffs else 0.0
+    return {"mean_abs_diff": round(mean_abs, 3), "count": len(common)}
+
+
+def run_llm_pair_metrics(client: Client, model: str, grok_text: str, wiki_text: str, user_tag: str) -> Dict[str, object]:
+    system_prompt = """You are an evaluator. Compare two articles (Grokipedia vs Wikipedia) and return strict JSON with:
+- loaded_language: {grok: [terms], wiki: [terms]}
+- propaganda_flags: {grok: [techniques], wiki: [techniques]}
+- omissions: {grok_missing: [concepts absent vs wiki], wiki_missing: [concepts absent vs grok]}
+- framing_contrast: list of objects {topic, grok_stance, wiki_stance}
+- sentiment_divergence_estimate: float in [0,2] (0 same, 2 opposite)
+- bias_summary: short string"""
+    user_prompt = f"""Article A (Grokipedia):
+\"\"\"{grok_text}\"\"\"
+
+Article B (Wikipedia):
+\"\"\"{wiki_text}\"\"\"
+
+Return JSON only."""
+    chat_req = client.chat.create(
+        model=model,
+        messages=[chat.system(system_prompt), chat.user(user_prompt)],
+        response_format="json_object",
+        temperature=0.1,
+        user=user_tag,
+    )
+    response = chat_req.sample()
+    try:
+        return json.loads(response.content)
+    except json.JSONDecodeError:
+        return {"error": "llm_metrics_parse_failed", "raw": response.content}
+
+
 def main() -> int:
     args = parse_args()
     load_dotenv()
@@ -159,10 +215,14 @@ def main() -> int:
     entity_similarity = compute_entity_similarity(
         grok_data.get("entities", []), wiki_data.get("entities", []), embed_model, args.embed_model
     )
+    sentiment_divergence = compute_sentiment_divergence(grok_data.get("entities", []), wiki_data.get("entities", []))
+    llm_metrics = run_llm_pair_metrics(client, args.llm_metrics_model, grok_text, wiki_text, args.user)
 
     metrics = {
         "entity_overlap": entity_overlap,
         "entity_similarity": entity_similarity,
+        "sentiment_divergence": sentiment_divergence,
+        "llm_metrics": llm_metrics,
         "claims_count": {
             "grokipedia": len(grok_data.get("claims", [])),
             "wikipedia": len(wiki_data.get("claims", [])),

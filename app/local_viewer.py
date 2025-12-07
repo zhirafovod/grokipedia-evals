@@ -116,6 +116,13 @@ def render_entities(analysis: Dict[str, Any]) -> None:
         st.markdown("**Top entity alignments (cosine similarity)**")
         st.dataframe(matches, hide_index=True, use_container_width=True)
 
+    sentiment_div = (analysis.get("metrics", {}) or {}).get("sentiment_divergence")
+    if sentiment_div:
+        st.markdown(
+            f"**Sentiment divergence (mean abs diff on shared entities)**: {sentiment_div.get('mean_abs_diff', 0):.3f} "
+            f"over {sentiment_div.get('count', 0)} common entities"
+        )
+
 
 def build_relation_graph(relations: list[dict], title: str, color: str = "#2b6cb0") -> str:
     """Build a Graphviz DOT string for relations."""
@@ -282,6 +289,35 @@ def render_linked_text(analysis: Dict[str, Any], grok_text: str, wiki_text: str)
     components.html(component_html, height=520, scrolling=True)
 
 
+def render_diff_entities(analysis: Dict[str, Any]) -> None:
+    st.subheader("Diff mode: unique concepts")
+    overlap = analysis.get("metrics", {}).get("entity_overlap", {}) or {}
+    grok_unique = overlap.get("grok_unique", []) or []
+    wiki_unique = overlap.get("wiki_unique", []) or []
+    cols = st.columns(2)
+    with cols[0]:
+        st.markdown("**Only in Grokipedia**")
+        if grok_unique:
+            st.code(", ".join(grok_unique))
+        else:
+            st.info("None")
+    with cols[1]:
+        st.markdown("**Only in Wikipedia**")
+        if wiki_unique:
+            st.code(", ".join(wiki_unique))
+        else:
+            st.info("None")
+
+
+def render_llm_metrics(analysis: Dict[str, Any]) -> None:
+    st.subheader("LLM-judged bias metrics")
+    llm_metrics = analysis.get("metrics", {}).get("llm_metrics", {}) or {}
+    if not llm_metrics:
+        st.info("No LLM metrics available.")
+        return
+    st.json(llm_metrics, expanded=False)
+
+
 def render_relation_graphs(analysis: Dict[str, Any]) -> None:
     st.subheader("Relations (graph view)")
     cols = st.columns(3)
@@ -345,6 +381,8 @@ def main() -> None:
         render_entities(analysis)
         render_relation_graphs(analysis)
         render_linked_text(analysis, grok_text, wiki_text)
+        render_diff_entities(analysis)
+        render_llm_metrics(analysis)
     else:
         st.info("No analysis artifact found in data/artifacts/<topic>/analysis.json. Run scripts/run_extraction.py first.")
 
