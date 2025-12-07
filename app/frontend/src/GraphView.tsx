@@ -1,10 +1,10 @@
 import React, { useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
-import coseBilkent from "cytoscape-cose-bilkent"; // For layout
+import fcose from "cytoscape-fcose"; // Better layout for distribution
 
 // Register layout
-cytoscape.use(coseBilkent);
+cytoscape.use(fcose);
 
 type Node = {
   id: string;
@@ -64,7 +64,7 @@ export function GraphView({
             sentiment: node.attrs?.sentiment,
             salience: node.attrs?.salience,
           },
-          position: { x: (idx % 10) * 100 + Math.random() * 50, y: Math.floor(idx / 10) * 100 + Math.random() * 50 }, // Initial positions to spread nodes
+          position: { x: (idx % 10) * 150, y: Math.floor(idx / 10) * 150 }, // Initial grid positions for better layout
           classes: source,
         });
       });
@@ -91,11 +91,14 @@ export function GraphView({
 
   const layout = useMemo(
     () => ({
-      name: "cose-bilkent",
+      name: "fcose",
       animate: true,
       animationDuration: 1000,
       fit: true,
       padding: 30,
+      nodeRepulsion: 5000,
+      idealEdgeLength: 100,
+      edgeElasticity: 0.1,
     }),
     []
   );
@@ -163,6 +166,8 @@ export function GraphView({
         stylesheet={stylesheet}
         layout={layout}
         style={{ width: "100%", height: "500px" }}
+        minZoom={0.1}
+        maxZoom={2}
         cy={onCyReady}
       />
       <div className="muted">{elements.length} elements</div>
