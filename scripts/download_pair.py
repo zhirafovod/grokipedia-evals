@@ -15,6 +15,7 @@ import json
 import re
 import sys
 import urllib.parse
+import html
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -83,6 +84,7 @@ def extract_grok_markdown(html: str) -> str:
 def markdown_to_plaintext(markdown: str) -> str:
     """Convert markdown to plain text while keeping basic structure."""
     text = markdown
+    text = html.unescape(text)
     text = re.sub(r"^(#{1,6})\s+(.+)$", r"\2", text, flags=re.MULTILINE)
     text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
     text = re.sub(r"\*([^*]+)\*", r"\1", text)
@@ -93,12 +95,24 @@ def markdown_to_plaintext(markdown: str) -> str:
     return text.strip()
 
 
+def normalize_text(text: str) -> str:
+    """Normalize whitespace and HTML entities for downstream processing."""
+    normalized = re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), text)
+    normalized = html.unescape(normalized)
+    normalized = normalized.replace("\r\n", "\n").replace("\r", "\n")
+    normalized = re.sub(r"[ \t]+\n", "\n", normalized)  # strip trailing spaces
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+    return normalized.strip()
+
+
 def fetch_grokipedia_article(url: str, keep_markdown: bool) -> str:
     html = fetch_html(url)
     markdown = extract_grok_markdown(html)
     if not markdown:
         raise ValueError("Could not extract Grokipedia article content")
-    return markdown if keep_markdown else markdown_to_plaintext(markdown)
+    if keep_markdown:
+        return normalize_text(markdown)
+    return normalize_text(markdown_to_plaintext(markdown))
 
 
 def parse_wikipedia_title(raw: str) -> str:
@@ -137,7 +151,7 @@ def fetch_wikipedia_plaintext(title: str, lang: str = "en") -> str:
     extract = page.get("extract", "")
     if not extract:
         raise ValueError(f"Wikipedia page not found or empty: {title}")
-    return extract.strip()
+    return normalize_text(extract)
 
 
 def infer_topic_slug(grok_url: str, wiki_title: str, override: Optional[str]) -> str:
