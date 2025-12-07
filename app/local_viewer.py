@@ -121,7 +121,10 @@ def build_relation_graph(relations: list[dict], title: str, color: str = "#2b6cb
 
 
 def build_unified_graph(grok_rel: list[dict], wiki_rel: list[dict], common_entities: set[str]) -> str:
-    """Graphviz DOT showing both sources; common entities are highlighted."""
+    """
+    Graphviz DOT showing both sources; common entities are highlighted.
+    Encodes source via edge color/style and shared entities via green fill/outline.
+    """
     lines = [
         'digraph "Unified" {',
         "rankdir=LR;",
