@@ -1,0 +1,11 @@
+{
+  "topic": "COVID-19_lab_leak_theory",
+  "grok_url": "https://grokipedia.com/page/COVID-19_lab_leak_theory",
+  "wiki_title": "COVID-19 lab leak theory",
+  "wiki_url": "https://en.wikipedia.org/wiki/COVID-19_lab_leak_theory",
+  "lang": "en",
+  "files": {
+    "grokipedia": "data/raw/COVID-19_lab_leak_theory/grokipedia.txt",
+    "wikipedia": "data/raw/COVID-19_lab_leak_theory/wikipedia.txt"
+  }
+}
