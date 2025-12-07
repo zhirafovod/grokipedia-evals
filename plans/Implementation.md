@@ -9,14 +9,14 @@ This document reviews the current implementation, identifies missing gaps for a 
 - Graph generation + embeddings: `scripts/generate_graphs.py` builds per-source graphs, comparison, and `embeddings.json` (SentenceTransformer + PCA).
 - Backend: `server/main.py` (FastAPI) serves topics, raw, analysis, graphs, comparison, embeddings, segments (generated + fallback), search, and recompute.
 - Segmentation: `scripts/generate_segments.py` emits `segments.json` (paragraph-level with entity spans); server serves it and falls back to paragraphs if missing.
-- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embeddings preview, recompute action, segment counts, inline highlights, entity search + selection chip); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
+- Frontend: `app/frontend` (React + Vite + React Query) has a compare layout shell (header, dual panes, metrics, embedding map, recompute action, segment counts, inline highlights, entity search + selection chip, salience filter/toggle); `app/local_viewer.py` (Streamlit) remains as a prototype playground.
 - `plans/Graph.md` defines graph schema, metrics, and comparison outputs.
 
 **Gaps**
 - Server still lacks filter endpoints, schema validation, recompute job status, and cache controls (segments are basic fallback only).
 - Graph/embedding generation is basic (no bias signal attributes, no layout hints, PCA-only projection, no size/quality validation).
 - Segments lack alignment/diff metadata and bias/sentiment densities; fallback remains paragraph-only.
-- UI lacks diff, Cytoscape graph view, embedding map, and filters/legends/sync scroll; design system is minimal (now includes inline highlights + search + selection + salience filter).
+- UI lacks diff, Cytoscape graph view, advanced embedding map overlays, and filters/legends/sync scroll; design system is minimal (now includes inline highlights + search + selection + salience filter).
 - No deterministic layout positions or visualization configs precomputed for client use.
 - No asset endpoints for future static exports (PNG/SVG) or prebuilt layout snapshots.
 
@@ -120,7 +120,8 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [x] Establish basic design tokens + palettes; reusable primitives (Card, Pill).
    - [x] Add inline segment highlights from `segments.json` + search box hitting backend search endpoint.
    - [x] Add entity selection from search with highlight emphasis in text panes; salience filter slider and toggle; data status panel.
-   - [ ] Compose `CompareView` with richer filter context and component wiring for diff/graphs.
+   - [x] Add shared filter/selection context for highlights.
+   - [ ] Compose `CompareView` with richer component wiring for diff/graphs.
 
 4. [ ] Text highlighting & diff
    - [x] Generate `segments.json` (paragraph-level, entity spans, offsets).
@@ -130,7 +131,7 @@ A single responsive page providing side-by-side comparison with deep interactivi
 
 5. [ ] Embeddings map
    - [x] Generate embeddings (sentence-transformers + PCA) for entities; save `embeddings.json`.
-   - [ ] React `EmbeddingMap` (Visx/Plotly) with source/type styling, filters, selection linking to text.
+   - [x] React `EmbeddingMap` (SVG scatter) with source styling, salience filter, selection linked to text; upgrade to Visx/Plotly later for richer interactions.
 
 6. [ ] Graph viz
    - [ ] Cytoscape.js network view per source; merged overlay mode.
@@ -146,10 +147,10 @@ A single responsive page providing side-by-side comparison with deep interactivi
    - [ ] Cache control and progress status endpoint.
 
 ## Next immediate actions
-- Flesh out React layout shell with header/sidebar + CompareView panes, wired to existing hooks.
-- Add `segments.json` generator + API endpoint; use it to drive highlights and diff modes in the React TextPane.
+- Wire diff/sync-scroll using aligned segments and add inline diff view.
 - Add Cytoscape.js network view with source toggles and overlap highlighting.
-- Add embedding scatter component (Visx/Plotly) with filters linked to text highlights.
+- Upgrade embedding map with clustering/legends (UMAP/t-SNE + overlays) and selection linking to text/graphs.
+- Introduce shared filter context for bias signals and sentiment ranges across components.
 
 ## Minimal Tech Stack
 

@@ -11,6 +11,8 @@ import {
   searchTopic,
   triggerRecompute,
 } from "./api";
+import { CompareProvider, useCompareControls } from "./CompareContext";
+import { EmbeddingMap, EmbeddingPoint } from "./EmbeddingMap";
 
 type GraphStats = { node_count?: number; edge_count?: number };
 type Graphs = {
@@ -36,8 +38,6 @@ type Segment = {
   entities?: EntitySpan[];
   metrics?: Record<string, any>;
 };
-
-type SelectedEntity = { name: string; source?: string; type?: string } | null;
 
 function StatusRow({
   label,
@@ -261,28 +261,6 @@ function MetricsPanel({
   );
 }
 
-function EmbeddingsPreview({ embeddings }: { embeddings?: any }) {
-  const sample = embeddings?.points?.slice(0, 8) || [];
-  return (
-    <div className="embeddings">
-      {sample.length === 0 && <div className="muted">No embedding points yet.</div>}
-      {sample.length > 0 && (
-        <ul>
-          {sample.map((p: any) => (
-            <li key={p.id}>
-              <span className="pill">{p.source}</span>
-              <strong>{p.label}</strong>
-              <span className="muted">
-                ({p.type || "entity"}) · sentiment {p.sentiment ?? "n/a"} · salience {p.salience ?? "n/a"}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 function useTopicSelection(topics: string[]) {
   const [topic, setTopic] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -294,13 +272,27 @@ function useTopicSelection(topics: string[]) {
 }
 
 function App() {
+  return (
+    <CompareProvider>
+      <CompareApp />
+    </CompareProvider>
+  );
+}
+
+function CompareApp() {
   const queryClient = useQueryClient();
   const { data: topics = [], isLoading: loadingTopics } = useQuery({ queryKey: ["topics"], queryFn: fetchTopics });
   const { topic, setTopic } = useTopicSelection(topics);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(null);
-  const [salienceThreshold, setSalienceThreshold] = useState(0);
-  const [showHighlights, setShowHighlights] = useState(true);
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedEntity,
+    setSelectedEntity,
+    salienceThreshold,
+    setSalienceThreshold,
+    showHighlights,
+    setShowHighlights,
+  } = useCompareControls();
 
   const { data: raw, isLoading: loadingRaw, error: rawError } = useQuery({
     queryKey: ["raw", topic],
@@ -446,8 +438,13 @@ function App() {
               </div>
             </Card>
 
-            <Card title="Embeddings preview">
-              <EmbeddingsPreview embeddings={embeddings} />
+            <Card title="Embedding map">
+              <EmbeddingMap
+                points={(embeddings?.points as EmbeddingPoint[]) || []}
+                selectedName={selectedEntity?.name}
+                onSelect={(label, source, type) => setSelectedEntity({ name: label, source, type })}
+                salienceThreshold={salienceThreshold}
+              />
             </Card>
           </div>
 
