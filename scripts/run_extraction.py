@@ -11,12 +11,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 from dotenv import load_dotenv
 from xai_sdk import Client, chat
+from sentence_transformers import SentenceTransformer, util
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -40,6 +42,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-chars", type=int, default=12000, help="Max characters from each article to send to the model")
     parser.add_argument("--out-dir", default=str(DATA_OUT), help="Base output directory for artifacts")
     parser.add_argument("--user", default="local-dev", help="User tag for telemetry")
+    parser.add_argument("--embed-model", default="all-MiniLM-L6-v2", help="SentenceTransformer model for entity embeddings")
     return parser.parse_args()
 
 
@@ -77,7 +80,7 @@ Article (truncated if long):
 def normalize_names(entities: List[Dict[str, object]]) -> List[str]:
     names: List[str] = []
     for ent in entities or []:
-        name = str(ent.get("name", "")).strip().lower()
+        name = canonical(str(ent.get("name", "")))
         if name:
             names.append(name)
     return names
@@ -99,6 +102,41 @@ def compute_entity_overlap(grok_entities: List[Dict[str, object]], wiki_entities
     }
 
 
+def canonical(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", text.strip().lower()).strip("_")
+
+
+def compute_entity_similarity(
+    grok_entities: List[Dict[str, object]], wiki_entities: List[Dict[str, object]], model: SentenceTransformer, model_name: str
+) -> Dict[str, object]:
+    grok_names = [ent.get("name", "") for ent in grok_entities if ent.get("name")]
+    wiki_names = [ent.get("name", "") for ent in wiki_entities if ent.get("name")]
+    if not grok_names or not wiki_names:
+        return {"matches": [], "model": model_name}
+
+    grok_emb = model.encode(grok_names, convert_to_tensor=True, show_progress_bar=False)
+    wiki_emb = model.encode(wiki_names, convert_to_tensor=True, show_progress_bar=False)
+    sim_matrix = util.cos_sim(grok_emb, wiki_emb)
+
+    matches: List[Dict[str, object]] = []
+    for i, g_name in enumerate(grok_names):
+        j = int(sim_matrix[i].argmax())
+        score = float(sim_matrix[i][j])
+        matches.append(
+            {
+                "grok_entity": g_name,
+                "wiki_entity": wiki_names[j],
+                "score": round(score, 4),
+            }
+        )
+
+    matches = sorted(matches, key=lambda x: x["score"], reverse=True)[:20]
+    return {
+        "matches": matches,
+        "model": model_name,
+    }
+
+
 def main() -> int:
     args = parse_args()
     load_dotenv()
@@ -107,6 +145,7 @@ def main() -> int:
         raise RuntimeError("XAI_API_KEY is not set (load .env or export it).")
 
     client = Client(api_key=api_key)
+    embed_model = SentenceTransformer(args.embed_model)
     out_dir = Path(args.out_dir) / args.topic
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -116,8 +155,14 @@ def main() -> int:
     grok_data = run_llm_extract(client, args.model, grok_text, "Grokipedia", args.user)
     wiki_data = run_llm_extract(client, args.model, wiki_text, "Wikipedia", args.user)
 
+    entity_overlap = compute_entity_overlap(grok_data.get("entities", []), wiki_data.get("entities", []))
+    entity_similarity = compute_entity_similarity(
+        grok_data.get("entities", []), wiki_data.get("entities", []), embed_model, args.embed_model
+    )
+
     metrics = {
-        "entity_overlap": compute_entity_overlap(grok_data.get("entities", []), wiki_data.get("entities", [])),
+        "entity_overlap": entity_overlap,
+        "entity_similarity": entity_similarity,
         "claims_count": {
             "grokipedia": len(grok_data.get("claims", [])),
             "wikipedia": len(wiki_data.get("claims", [])),
@@ -132,6 +177,7 @@ def main() -> int:
             "grokipedia_path": str(grok_path),
             "wikipedia_path": str(wiki_path),
             "max_chars": args.max_chars,
+            "embed_model": args.embed_model,
         },
         "articles": {
             "grokipedia": grok_data,

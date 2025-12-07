@@ -9,10 +9,13 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
+import html
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,6 +110,12 @@ def render_entities(analysis: Dict[str, Any]) -> None:
             st.caption("Common entities")
             st.code(", ".join(overlap["intersection"]))
 
+    similarity = analysis.get("metrics", {}).get("entity_similarity", {}) or {}
+    matches = similarity.get("matches") or []
+    if matches:
+        st.markdown("**Top entity alignments (cosine similarity)**")
+        st.dataframe(matches, hide_index=True, use_container_width=True)
+
 
 def build_relation_graph(relations: list[dict], title: str, color: str = "#2b6cb0") -> str:
     """Build a Graphviz DOT string for relations."""
@@ -155,6 +164,122 @@ def build_unified_graph(grok_rel: list[dict], wiki_rel: list[dict], common_entit
 
     lines.append("}")
     return "\n".join(lines)
+
+
+def canonical_name(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def build_highlight_html(text: str, entity_names: set[str], source: str, max_hits_per_entity: int = 2) -> str:
+    """Wrap common entities with spans to enable hover sync."""
+    if not text or not entity_names:
+        return f"<div class='text-pane empty'>No text</div>"
+
+    escaped_segments: list[str] = []
+    canon_entities = {canonical_name(n) for n in entity_names if n}
+    names_sorted = sorted({n for n in entity_names if n}, key=len, reverse=True)
+    if not names_sorted:
+        return f"<div class='text-pane'>{html.escape(text)}</div>"
+
+    pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in names_sorted) + r")\b", flags=re.IGNORECASE)
+    counts: Dict[str, int] = {}
+    idx = 0
+    for match in pattern.finditer(text):
+        start, end = match.span()
+        escaped_segments.append(html.escape(text[idx:start]))
+        raw = match.group(0)
+        canon = canonical_name(raw)
+        counts[canon] = counts.get(canon, 0) + 1
+        if counts[canon] <= max_hits_per_entity and canon in canon_entities:
+            escaped_segments.append(
+                f"<span class='entity entity-{source}' data-entity='{canon}'>{html.escape(raw)}</span>"
+            )
+        else:
+            escaped_segments.append(html.escape(raw))
+        idx = end
+    escaped_segments.append(html.escape(text[idx:]))
+    return "<div class='text-pane'>" + "".join(escaped_segments) + "</div>"
+
+
+def render_linked_text(analysis: Dict[str, Any], grok_text: str, wiki_text: str) -> None:
+    st.subheader("Linked entities in text")
+    overlap = analysis.get("metrics", {}).get("entity_overlap", {}) or {}
+    common = {canonical_name(n) for n in overlap.get("intersection", [])}
+    if not common:
+        st.info("No common entities detected to link in text.")
+        return
+
+    grok_entities = analysis.get("articles", {}).get("grokipedia", {}).get("entities", [])
+    wiki_entities = analysis.get("articles", {}).get("wikipedia", {}).get("entities", [])
+    grok_names = {e.get("name", "") for e in grok_entities if canonical_name(e.get("name", "")) in common}
+    wiki_names = {e.get("name", "") for e in wiki_entities if canonical_name(e.get("name", "")) in common}
+
+    grok_html = build_highlight_html(grok_text, grok_names, "grok")
+    wiki_html = build_highlight_html(wiki_text, wiki_names, "wiki")
+
+    component_html = f"""
+    <style>
+    .linked-container {{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }}
+    .panel {{
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 8px;
+        background: #fafafa;
+    }}
+    .text-pane {{
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 8px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        line-height: 1.4;
+    }}
+    .entity {{
+        padding: 1px 3px;
+        border-radius: 4px;
+        cursor: pointer;
+    }}
+    .entity-grok {{
+        background: #e0edff;
+    }}
+    .entity-wiki {{
+        background: #fff1e6;
+    }}
+    .entity.hovered {{
+        outline: 2px solid #10b981;
+        background: #d1fae5 !important;
+    }}
+    </style>
+    <div class="linked-container">
+        <div class="panel">
+            <div><strong>Grokipedia</strong></div>
+            {grok_html}
+        </div>
+        <div class="panel">
+            <div><strong>Wikipedia</strong></div>
+            {wiki_html}
+        </div>
+    </div>
+    <script>
+    const spans = document.querySelectorAll('.entity');
+    spans.forEach(span => {{
+        span.addEventListener('mouseenter', () => {{
+            const key = span.dataset.entity;
+            document.querySelectorAll(`[data-entity="${{key}}"]`).forEach(el => el.classList.add('hovered'));
+        }});
+        span.addEventListener('mouseleave', () => {{
+            const key = span.dataset.entity;
+            document.querySelectorAll(`[data-entity="${{key}}"]`).forEach(el => el.classList.remove('hovered'));
+        }});
+    }});
+    </script>
+    """
+    components.html(component_html, height=520, scrolling=True)
 
 
 def render_relation_graphs(analysis: Dict[str, Any]) -> None:
@@ -219,6 +344,7 @@ def main() -> None:
     if analysis:
         render_entities(analysis)
         render_relation_graphs(analysis)
+        render_linked_text(analysis, grok_text, wiki_text)
     else:
         st.info("No analysis artifact found in data/artifacts/<topic>/analysis.json. Run scripts/run_extraction.py first.")
 
