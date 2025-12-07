@@ -320,11 +320,26 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .filter label {
   font-size: 13px;
   color: var(--muted);
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.switch-row input[type="checkbox"] {
+  accent-color: var(--accent);
 }
 
 .status-row {

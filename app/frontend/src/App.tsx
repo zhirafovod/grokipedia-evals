@@ -111,11 +111,13 @@ function HighlightedSegment({
   index,
   selectedName,
   salienceThreshold,
+  showHighlights,
 }: {
   segment: Segment;
   index: number;
   selectedName?: string;
   salienceThreshold: number;
+  showHighlights: boolean;
 }) {
   const { text = "", entities = [], start = 0 } = segment;
   const parts = useMemo(() => {
@@ -130,6 +132,9 @@ function HighlightedSegment({
       .sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
     const nodes: React.ReactNode[] = [];
     let cursor = 0;
+    if (!showHighlights || normalized.length === 0) {
+      return [text];
+    }
     for (const ent of normalized) {
       const relStart = (ent.start ?? 0) - start;
       const relEnd = (ent.end ?? 0) - start;
@@ -176,6 +181,7 @@ function TextPane({
   segments,
   selectedName,
   salienceThreshold,
+  showHighlights,
 }: {
   title: string;
   text?: string;
@@ -183,6 +189,7 @@ function TextPane({
   segments?: Segment[];
   selectedName?: string;
   salienceThreshold: number;
+  showHighlights: boolean;
 }) {
   const paragraphs = (text || "").split(/\n\n+/).filter(Boolean);
   const hasSegments = segments && segments.length > 0;
@@ -199,6 +206,7 @@ function TextPane({
               index={idx}
               selectedName={selectedName}
               salienceThreshold={salienceThreshold}
+              showHighlights={showHighlights}
             />
           ))}
         </div>
@@ -292,6 +300,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(null);
   const [salienceThreshold, setSalienceThreshold] = useState(0);
+  const [showHighlights, setShowHighlights] = useState(true);
 
   const { data: raw, isLoading: loadingRaw, error: rawError } = useQuery({
     queryKey: ["raw", topic],
@@ -423,6 +432,7 @@ function App() {
                   segments={segments?.segments?.grokipedia as Segment[] | undefined}
                   selectedName={selectedEntity?.name}
                   salienceThreshold={salienceThreshold}
+                  showHighlights={showHighlights}
                 />
                 <TextPane
                   title="Wikipedia"
@@ -431,6 +441,7 @@ function App() {
                   segments={segments?.segments?.wikipedia as Segment[] | undefined}
                   selectedName={selectedEntity?.name}
                   salienceThreshold={salienceThreshold}
+                  showHighlights={showHighlights}
                 />
               </div>
             </Card>
@@ -468,6 +479,10 @@ function App() {
                   value={salienceThreshold}
                   onChange={(e) => setSalienceThreshold(parseFloat(e.target.value))}
                 />
+                <div className="switch-row">
+                  <span>Show highlights</span>
+                  <input type="checkbox" checked={showHighlights} onChange={(e) => setShowHighlights(e.target.checked)} />
+                </div>
               </div>
             </Card>
 
